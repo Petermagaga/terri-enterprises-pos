@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
     #Project applications
     "apps.accounts.apps.AccountsConfig",
+    "apps.products.apps.ProductsConfig",
 ]
 
 AUTH_USER_MODEL="accounts.User"

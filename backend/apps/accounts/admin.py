@@ -1,44 +1,41 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from rest_framework.permissions import BasePermission
 
 
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class IsOwner(BasePermission):
+    """
+    Grants access only to active business owners.
+    """
 
-    list_display = (
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "role",
-        "is_active",
-        "is_staff",
-    )
+    message = "Only the business owner can access this resource."
 
-    list_filter = (
-        "role",
-        "is_active",
-        "is_staff",
-    )
+    def has_permission(self, request, view):
+        user = request.user
 
-    fieldsets = UserAdmin.fieldsets + (
-        (
-            "POS Permissions",
-            {
-                "fields": ("role",),
-            },
-        ),
-    )
+        return (
+            user
+            and user.is_authenticated
+            and user.is_active
+            and user.role == "OWNER"
+        )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (
-            "POS Permissions",
-            {
-                "fields": ("role",),
-            },
-        ),
-    )
 
-    search_fields = ("username", "email", "first_name", "last_name")
+class IsOwnerOrCashier(BasePermission):
+    """
+    Grants access to active owner and cashier accounts.
+    """
+
+    def has_permission(self, request, view):
+        user = request.user
+
+        return (
+            user
+            and user.is_authenticated
+            and user.is_active
+            and user.role in ("OWNER", "CASHIER")
+        )
+
+
+"""
+then about invoices creation and exposed to pdf (my idea was cash can highlight different product put into something like cart and in that there is total and an option of creating that list as invoice with supermarket logo
+"""
