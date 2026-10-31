@@ -15,6 +15,7 @@ class IsOwner(BasePermission):
             user
             and user.is_authenticated
             and user.role == "OWNER"
+            and user.is_staff
             and user.is_active
             and user.is_superuser
         )

@@ -54,13 +54,14 @@ INSTALLED_APPS = [
 
     # Third-party applications
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
 
     #Project applications
     "apps.accounts.apps.AccountsConfig",
 ]
 
-AUTH_USER_MODEL="accounts.user"
+AUTH_USER_MODEL="accounts.User"
 
 # --------------------------------------------------
 # MIDDLEWARE
@@ -178,6 +179,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # --------------------------------------------------
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],

@@ -4,12 +4,12 @@ from django.db import models
 
 class CustomUserManager(UserManager):
     """
-    Ensures that users created through createsuperuser
-    automatically receive the OWNER role.
+    Ensures that Django superusers always receive the OWNER role.
     """
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("role", self.model.Role.OWNER)
+        # A superuser must always have the OWNER business role.
+        extra_fields["role"] = self.model.Role.OWNER
 
         return super().create_superuser(
             username=username,
