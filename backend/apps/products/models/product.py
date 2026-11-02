@@ -36,7 +36,7 @@ class Product(models.Model):
     size_value = models.DecimalField(
         max_digits=10,
         decimal_places=3,
-        validators=[MinValueValidator(Decimal(0.001))],
+        validators=[MinValueValidator(Decimal("0.001"))],
     )
 
     size_unit = models.CharField(
@@ -44,8 +44,7 @@ class Product(models.Model):
         choices=SizeUnit.choices,
     )
 
-    # The smallest unit in which stock is counted.
-    # Examples: bottle, packet, tub, bag, piece.
+
     base_unit = models.CharField(max_length=30)
 
     retail_price = models.DecimalField(
