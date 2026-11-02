@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from apps.products.models import Category, Product, ProductFamily
 from apps.products.services.product_creation import create_product
 
+from django.db import DatabaseError, transaction
 
 pytestmark = pytest.mark.django_db
 
@@ -92,3 +93,50 @@ def test_product_creation_rolls_back_family_prefix_on_failure(
 
     assert family.sku_prefix is None
     assert Product.objects.count() == 0
+
+
+
+def test_database_trigger_prevents_queryset_sku_changes(category, family):
+    product = create_product(
+        name="Margarine 50g",
+        product_family=family,
+        category=category,
+        size_value=50,
+        size_unit="G",
+        base_unit="tub",
+        retail_price=60,
+        wholesale_price=55,
+    )
+
+    original_sku = product.sku
+
+    with pytest.raises(DatabaseError, match="Product SKU cannot be changed"):
+        with transaction.atomic():
+            Product.objects.filter(pk=product.pk).update(
+                sku="TEST-050G"
+            )
+
+    product.refresh_from_db()
+
+    assert product.sku == original_sku
+
+
+def test_database_trigger_allows_other_product_updates(category, family):
+    product = create_product(
+        name="Margarine 50g",
+        product_family=family,
+        category=category,
+        size_value=50,
+        size_unit="G",
+        base_unit="tub",
+        retail_price=60,
+        wholesale_price=55,
+    )
+
+    Product.objects.filter(pk=product.pk).update(retail_price=65)
+
+    product.refresh_from_db()
+
+    assert product.retail_price == Decimal("65.00")
+    assert product.sku == "MARG-050G"
+
