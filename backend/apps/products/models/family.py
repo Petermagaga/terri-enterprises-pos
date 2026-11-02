@@ -1,9 +1,11 @@
-
 from django.db import models
 
 
 class ProductFamily(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+    )
 
     sku_prefix = models.CharField(
         max_length=4,
@@ -13,8 +15,12 @@ class ProductFamily(models.Model):
         blank=True,
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
         verbose_name = "Product Family"

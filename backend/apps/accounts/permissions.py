@@ -1,9 +1,10 @@
+
 from rest_framework.permissions import BasePermission
 
 
 class IsOwner(BasePermission):
     """
-    Grants access only to authenticated owner accounts.
+    Grants access only to authenticated, active owner accounts.
     """
 
     message = "Only the business owner can access this resource."
@@ -14,16 +15,14 @@ class IsOwner(BasePermission):
         return (
             user
             and user.is_authenticated
-            and user.role == "OWNER"
-            and user.is_staff
             and user.is_active
-            and user.is_superuser
+            and user.role == "OWNER"
         )
 
 
 class IsOwnerOrCashier(BasePermission):
     """
-    Grants access to active owner and cashier accounts.
+    Grants access to authenticated, active owner and cashier accounts.
     """
 
     def has_permission(self, request, view):

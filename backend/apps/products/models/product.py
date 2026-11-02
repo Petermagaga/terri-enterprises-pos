@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-
+from decimal import Decimal
 
 class Product(models.Model):
 
@@ -36,7 +36,7 @@ class Product(models.Model):
     size_value = models.DecimalField(
         max_digits=10,
         decimal_places=3,
-        validators=[MinValueValidator(0.001)],
+        validators=[MinValueValidator(Decimal(0.001))],
     )
 
     size_unit = models.CharField(
@@ -51,13 +51,13 @@ class Product(models.Model):
     retail_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
 
     wholesale_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
 
     reorder_level = models.PositiveIntegerField(default=0)
