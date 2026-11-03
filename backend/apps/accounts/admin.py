@@ -35,7 +35,3 @@ class IsOwnerOrCashier(BasePermission):
             and user.role in ("OWNER", "CASHIER")
         )
 
-
-"""
-then about invoices creation and exposed to pdf (my idea was cash can highlight different product put into something like cart and in that there is total and an option of creating that list as invoice with supermarket logo
-"""

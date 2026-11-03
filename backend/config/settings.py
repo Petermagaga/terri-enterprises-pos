@@ -57,9 +57,10 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
 
-    #Project applications
+    # Project applications
     "apps.accounts.apps.AccountsConfig",
     "apps.products.apps.ProductsConfig",
+    "apps.suppliers.apps.SuppliersConfig",
 ]
 
 AUTH_USER_MODEL="accounts.User"
