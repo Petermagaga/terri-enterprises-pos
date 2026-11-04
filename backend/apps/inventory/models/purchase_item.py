@@ -1,6 +1,7 @@
 
-from decimal import Decimal
+from decimal import Decimal,ROUND_HALF_UP
 from django.db.models import Q
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -83,9 +84,13 @@ class PurchaseItem(models.Model):
     def base_quantity(self):
         return self.package_quantity * self.conversion_factor_snapshot
 
+
     @property
     def line_subtotal(self):
-        return self.package_quantity * self.purchase_unit_cost
+        return (self.package_quantity * self.purchase_unit_cost).quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
 
     @property
     def landed_total_cost(self):
