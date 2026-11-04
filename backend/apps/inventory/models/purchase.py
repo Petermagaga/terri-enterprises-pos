@@ -1,6 +1,6 @@
 
 from decimal import Decimal
-
+from django.db.models import Q
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -61,6 +61,13 @@ class Purchase(models.Model):
         ordering = ["-purchase_date", "-created_at"]
         verbose_name = "Purchase"
         verbose_name_plural = "Purchases"
+
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(transport_cost__gte=0),
+                name="purchase_transport_cost_nonnegative",
+            ),
+        ]
 
     def __str__(self):
         return f"Purchase #{self.pk} - {self.supplier.name}"

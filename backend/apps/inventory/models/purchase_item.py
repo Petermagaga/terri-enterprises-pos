@@ -1,6 +1,6 @@
 
 from decimal import Decimal
-
+from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -59,6 +59,25 @@ class PurchaseItem(models.Model):
         ordering = ["id"]
         verbose_name = "Purchase Item"
         verbose_name_plural = "Purchase Items"
+
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(conversion_factor_snapshot__gt=0),
+                name="purchase_item_conversion_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(package_quantity__gt=0),
+                name="purchase_item_package_quantity_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(purchase_unit_cost__gte=0),
+                name="purchase_item_unit_cost_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(allocated_transport_cost__gte=0),
+                name="purchase_item_transport_nonnegative",
+            ),
+        ]
 
     @property
     def base_quantity(self):
