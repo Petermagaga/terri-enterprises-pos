@@ -10,6 +10,7 @@ from apps.inventory.models import (
     Purchase,
     PurchaseItem,
     StockBatch,
+    StockMovement,InventoryBalance
 )
 from apps.inventory.services.purchase_creation import (
     add_purchase_item,
@@ -227,3 +228,134 @@ def test_receiving_preserves_zero_transport_cost(
     batches = receive_purchase(purchase=purchase)
 
     assert batches[0].landed_unit_cost == Decimal("100.000000")
+
+
+def test_receiving_creates_purchase_stock_movement(
+    purchase, product_and_packaging
+):
+    product, packaging = product_and_packaging
+
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=2,
+        purchase_unit_cost=Decimal("2400.00"),
+    )
+
+    receive_purchase(purchase=purchase)
+
+    movement = StockMovement.objects.get(
+        product=product,
+        movement_type=StockMovement.MovementType.PURCHASE_RECEIPT,
+    )
+
+    assert movement.direction == StockMovement.Direction.IN
+    assert movement.quantity == Decimal("24.000")
+    assert movement.unit_cost == Decimal("205.000000")
+    assert movement.stock_batch is not None
+    assert movement.reference == f"PURCHASE-{purchase.pk}"
+    assert movement.created_by == purchase.created_by
+
+
+def test_receiving_updates_inventory_balance(
+    purchase, product_and_packaging
+):
+    product, packaging = product_and_packaging
+
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=2,
+        purchase_unit_cost=Decimal("2400.00"),
+    )
+
+    receive_purchase(purchase=purchase)
+
+    balance = InventoryBalance.objects.get(product=product)
+
+    assert balance.quantity_on_hand == Decimal("24.000")
+
+
+def test_receiving_multiple_items_updates_same_product_balance(
+    purchase, product_and_packaging
+):
+    product, packaging = product_and_packaging
+
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=1,
+        purchase_unit_cost=Decimal("2400.00"),
+    )
+
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=2,
+        purchase_unit_cost=Decimal("2300.00"),
+    )
+
+    receive_purchase(purchase=purchase)
+
+    balance = InventoryBalance.objects.get(product=product)
+
+    # 1 carton + 2 cartons = 3 cartons × 12 bottles.
+    assert balance.quantity_on_hand == Decimal("36.000")
+
+    assert StockMovement.objects.filter(
+        product=product,
+        movement_type=StockMovement.MovementType.PURCHASE_RECEIPT,
+    ).count() == 2
+
+def test_failed_receiving_rolls_back_all_stock_changes(
+    purchase, product_and_packaging, monkeypatch
+):
+    product, packaging = product_and_packaging
+
+    # Add two purchase lines so receiving can fail partway through.
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=1,
+        purchase_unit_cost=Decimal("2400.00"),
+    )
+
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity=2,
+        purchase_unit_cost=Decimal("2300.00"),
+    )
+
+    original_save = StockMovement.save
+    save_calls = 0
+
+    def failing_save(self, *args, **kwargs):
+        nonlocal save_calls
+        save_calls += 1
+
+        if save_calls == 2:
+            raise ValidationError("Simulated stock movement failure.")
+
+        return original_save(self, *args, **kwargs)
+
+    monkeypatch.setattr(StockMovement, "save", failing_save)
+
+    with pytest.raises(ValidationError):
+        receive_purchase(purchase=purchase)
+
+    # No partial stock records should remain.
+    assert StockBatch.objects.count() == 0
+    assert StockMovement.objects.count() == 0
+    assert not InventoryBalance.objects.filter(product=product).exists()
+
+    # The purchase must remain a draft.
+    purchase.refresh_from_db()
+    assert purchase.status == Purchase.Status.DRAFT
+    assert purchase.received_at is None
