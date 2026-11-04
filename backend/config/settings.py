@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.suppliers.apps.SuppliersConfig",
+    "apps.inventory.apps.InventoryConfig",
 ]
 
 AUTH_USER_MODEL="accounts.User"
