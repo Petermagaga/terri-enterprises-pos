@@ -4,8 +4,23 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+
 from apps.accounts.models import User
-from apps.inventory.models import Purchase
+from apps.inventory.models import (
+    InventoryBalance,
+    ProductPackaging,
+    Purchase,
+    PurchaseItem,
+    StockBatch,
+    StockMovement,
+)
+
+from apps.inventory.services.purchase_creation import (
+    add_purchase_item,
+    create_purchase,
+)
+from apps.products.models import Category, ProductFamily
+from apps.products.services.product_creation import create_product
 from apps.inventory.services.purchase_creation import create_purchase
 from apps.suppliers.models import Supplier
 
@@ -50,6 +65,46 @@ def purchase(owner, supplier):
         transport_cost="200.00",
     )
 
+
+@pytest.fixture
+def product(db):
+    category = Category.objects.create(name="Groceries")
+    family = ProductFamily.objects.create(name="Cooking Oil")
+
+    return create_product(
+        name="Cooking Oil 1L",
+        product_family=family,
+        category=category,
+        size_value=1000,
+        size_unit="ML",
+        base_unit="bottle",
+        retail_price="250.00",
+        wholesale_price="230.00",
+    )
+
+
+@pytest.fixture
+def packaging(product):
+    return ProductPackaging.objects.create(
+        product=product,
+        name="Carton",
+        conversion_factor=12,
+        purchase_enabled=True,
+        sales_enabled=True,
+    )
+
+
+@pytest.fixture
+def purchase_with_item(purchase, product, packaging):
+    add_purchase_item(
+        purchase=purchase,
+        product=product,
+        packaging=packaging,
+        package_quantity="2.000",
+        purchase_unit_cost="2400.00",
+    )
+
+    return purchase
 
 @pytest.fixture
 def purchase_data(supplier):
@@ -346,4 +401,108 @@ def test_purchase_cannot_be_permanently_deleted(
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
     assert Purchase.objects.filter(pk=purchase.pk).exists()
 
+
+# PURCHASE RECEIVING API TESTS
+
+@pytest.mark.django_db
+def test_owner_can_receive_purchase(
+    api_client, owner, purchase_with_item, product
+):
+    api_client.force_authenticate(user=owner)
+
+    response = api_client.post(
+        reverse(
+            "inventory-purchase-receive",
+            args=[purchase_with_item.pk],
+        )
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["status"] == Purchase.Status.RECEIVED
+    assert response.data["received_at"] is not None
+
+    purchase_with_item.refresh_from_db()
+    assert purchase_with_item.status == Purchase.Status.RECEIVED
+
+    batch = StockBatch.objects.get(
+        purchase_item__purchase=purchase_with_item
+    )
+
+    assert batch.product == product
+    assert batch.received_quantity == 24
+    assert batch.remaining_quantity == 24
+
+    movement = StockMovement.objects.get(
+        stock_batch=batch
+    )
+
+    assert movement.movement_type == (
+        StockMovement.MovementType.PURCHASE_RECEIPT
+    )
+    assert movement.direction == StockMovement.Direction.IN
+    assert movement.quantity == 24
+
+    balance = InventoryBalance.objects.get(product=product)
+    assert balance.quantity_on_hand == 24
+
+
+@pytest.mark.django_db
+def test_cashier_cannot_receive_purchase(
+    api_client, cashier, purchase_with_item
+):
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.post(
+        reverse(
+            "inventory-purchase-receive",
+            args=[purchase_with_item.pk],
+        )
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    purchase_with_item.refresh_from_db()
+    assert purchase_with_item.status == Purchase.Status.DRAFT
+
+    assert StockBatch.objects.count() == 0
+    assert StockMovement.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_unauthenticated_user_cannot_receive_purchase(
+    api_client, purchase_with_item
+):
+    response = api_client.post(
+        reverse(
+            "inventory-purchase-receive",
+            args=[purchase_with_item.pk],
+        )
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    purchase_with_item.refresh_from_db()
+    assert purchase_with_item.status == Purchase.Status.DRAFT
+
+
+@pytest.mark.django_db
+def test_receiving_purchase_without_items_returns_validation_error(
+    api_client, owner, purchase
+):
+    api_client.force_authenticate(user=owner)
+
+    response = api_client.post(
+        reverse(
+            "inventory-purchase-receive",
+            args=[purchase.pk],
+        )
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert Purchase.objects.get(pk=purchase.pk).status == (
+        Purchase.Status.DRAFT
+    )
+
+    assert StockBatch.objects.count() == 0
+    assert StockMovement.objects.count() == 0
     
