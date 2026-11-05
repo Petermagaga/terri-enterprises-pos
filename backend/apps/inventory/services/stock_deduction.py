@@ -22,6 +22,7 @@ def deduct_stock_fifo(
     created_by,
     reference="",
     notes="",
+    movement_type=StockMovement.MovementType.SALE,
 ):
     """
     Deduct product stock using First In, First Out (FIFO).
@@ -31,6 +32,15 @@ def deduct_stock_fifo(
     Returns a list describing the quantity and cost deducted
     from each batch.
     """
+    allowed_movement_types = {
+        StockMovement.MovementType.SALE,
+        StockMovement.MovementType.ADJUSTMENT_OUT,
+        StockMovement.MovementType.DAMAGE,
+    }
+
+    if movement_type not in allowed_movement_types:
+        raise ValidationError("Invalid stock deduction movement type.")
+
 
     if not isinstance(product, Product):
         raise ValidationError("A valid product is required.")
@@ -126,7 +136,8 @@ def deduct_stock_fifo(
         movement = StockMovement.objects.create(
             product=product,
             stock_batch=batch,
-            movement_type=StockMovement.MovementType.SALE,
+            
+            movement_type=movement_type,
             direction=StockMovement.Direction.OUT,
             quantity=deducted_quantity,
             unit_cost=batch.landed_unit_cost,

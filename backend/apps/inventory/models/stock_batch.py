@@ -17,6 +17,8 @@ class StockBatch(models.Model):
         "inventory.PurchaseItem",
         on_delete=models.PROTECT,
         related_name="stock_batch",
+        null=True,
+        blank=True,
     )
 
     received_quantity = models.DecimalField(
