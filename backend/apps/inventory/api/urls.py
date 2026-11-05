@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from apps.inventory.api.views import (
@@ -5,6 +6,8 @@ from apps.inventory.api.views import (
     PurchaseViewSet,
     PurchaseItemViewSet,
     StockBalanceViewSet,
+    StockMovementViewSet,
+    StockAdjustmentView
 )
 
 
@@ -34,4 +37,18 @@ router.register(
     basename="inventory-stock-balance",
 )
 
-urlpatterns = router.urls
+router.register(
+    "stock-movements",
+    StockMovementViewSet,
+    basename="inventory-stock-movement",
+)
+
+
+urlpatterns = [
+    path(
+        "stock-adjustments/",
+        StockAdjustmentView.as_view(),
+        name="inventory-stock-adjustment",
+    ),
+    *router.urls,
+]
