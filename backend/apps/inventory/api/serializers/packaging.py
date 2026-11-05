@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from apps.inventory.models import ProductPackaging
@@ -27,6 +28,8 @@ class ProductPackagingSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
+
         instance = self.instance
 
         if instance is not None:
@@ -59,3 +62,23 @@ class ProductPackagingSerializer(serializers.ModelSerializer):
                     })
 
         return attrs
+
+    def create(self, validated_data):
+        try:
+            return super().create(validated_data)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(
+                exc.message_dict
+                if hasattr(exc, "message_dict")
+                else exc.messages
+            ) from exc
+
+    def update(self, instance, validated_data):
+        try:
+            return super().update(instance, validated_data)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(
+                exc.message_dict
+                if hasattr(exc, "message_dict")
+                else exc.messages
+            ) from exc
