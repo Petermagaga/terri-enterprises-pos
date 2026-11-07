@@ -8,6 +8,9 @@ from apps.reporting.services.sales_summary import (
     calculate_sales_summary,
 )
 
+from apps.reporting.services.product_profitability import (
+    calculate_product_profitability,
+)
 
 def get_owner_dashboard_summary() -> dict:
     """
@@ -24,6 +27,7 @@ def get_owner_dashboard_summary() -> dict:
         group_by="daily",
     )
     stock_summary = get_stock_summary()
+    top_products = calculate_product_profitability(date_range)[:5]
 
     today_sales = sales_summary[0] if sales_summary else {
         "sale_count": 0,
@@ -38,4 +42,5 @@ def get_owner_dashboard_summary() -> dict:
         "payment_summary": payment_summary,
         "sales_summary": today_sales,
         "stock_summary": stock_summary,
+        "top_products": top_products,
     }

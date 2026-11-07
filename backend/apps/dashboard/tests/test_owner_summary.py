@@ -3,9 +3,7 @@ from decimal import Decimal
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from apps.reporting.services.product_profitability import (
-    calculate_product_profitability,
-)
+
 from apps.dashboard.services.owner_summary import (
     get_owner_dashboard_summary,
 )
@@ -14,6 +12,9 @@ from apps.reporting.services.date_ranges import DateRange
 
 class OwnerDashboardSummaryTests(SimpleTestCase):
 
+    @patch(
+        "apps.dashboard.services.owner_summary.calculate_product_profitability"
+    )
     @patch(
         "apps.dashboard.services.owner_summary.get_stock_summary"
     )
@@ -37,6 +38,7 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
         mock_calculate_payment_summary,
         mock_calculate_sales_summary,
         mock_get_stock_summary,
+        mock_calculate_product_profitability,
     ):
         today = date(2026, 11, 7)
 
@@ -77,6 +79,23 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
             "total_transactions": 5,
         }
 
+        expected_top_products = [
+            {
+                "product_id": 1,
+                "product_name": "Margarine 500G",
+                "product_sku": "MARG-500G",
+                "quantity_sold": 10,
+                "revenue": Decimal("2000.00"),
+                "cost_of_goods_sold": Decimal("1500.00"),
+                "gross_profit": Decimal("500.00"),
+            }
+        ]
+
+        mock_calculate_product_profitability.return_value = (
+            expected_top_products
+        )
+
+
         mock_get_date_range.return_value = expected_range
         mock_calculate_profit_loss.return_value = (
             expected_financial_summary
@@ -91,6 +110,15 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
             "out_of_stock_products": 2,
         }
         result = get_owner_dashboard_summary()
+
+        mock_calculate_product_profitability.assert_called_once_with(
+            expected_range
+        )
+
+        self.assertEqual(
+            result["top_products"],
+            expected_top_products,
+        )
 
         mock_calculate_sales_summary.assert_called_once_with(
             expected_range,
@@ -130,6 +158,10 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
         )
 
     @patch(
+        "apps.dashboard.services.owner_summary.calculate_product_profitability"
+    )
+
+    @patch(
     "apps.dashboard.services.owner_summary.get_stock_summary"
 )
 
@@ -152,10 +184,28 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
         mock_calculate_payment_summary,
         mock_calculate_sales_summary,
         mock_get_stock_summary,
+        mock_calculate_product_profitability,
     ):
         today = date(2026, 11, 7)
 
         expected_range = DateRange(today, today)
+
+        expected_top_products = [
+            {
+                "product_id": 1,
+                "product_name": "Margarine 500G",
+                "product_sku": "MARG-500G",
+                "quantity_sold": 10,
+                "revenue": Decimal("2000.00"),
+                "cost_of_goods_sold": Decimal("1500.00"),
+                "gross_profit": Decimal("500.00"),
+            }
+        ]
+
+        mock_calculate_product_profitability.return_value = (
+            expected_top_products
+        )
+
 
         mock_get_date_range.return_value = expected_range
         mock_calculate_profit_loss.return_value = {}
@@ -167,6 +217,16 @@ class OwnerDashboardSummaryTests(SimpleTestCase):
             "out_of_stock_products": 2,
         }
         result = get_owner_dashboard_summary()
+
+        mock_calculate_product_profitability.assert_called_once_with(
+            expected_range
+        )
+
+        self.assertEqual(
+            result["top_products"],
+            expected_top_products,
+        )
+
 
         self.assertEqual(
             result["sales_summary"],
