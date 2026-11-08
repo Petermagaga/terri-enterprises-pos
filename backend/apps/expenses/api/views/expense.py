@@ -9,6 +9,7 @@ from rest_framework import (
     status,
     viewsets,
 )
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -59,8 +60,10 @@ class ExpenseViewSet(
                 else exc.messages
             ) from exc
 
+
+
         except PermissionDenied as exc:
-            raise serializers.ValidationError(str(exc)) from exc
+            raise DRFPermissionDenied(str(exc)) from exc
 
         return Response(
             self.get_serializer(expense).data,
@@ -105,8 +108,9 @@ class ExpenseViewSet(
                 else exc.messages
             ) from exc
 
+
         except PermissionDenied as exc:
-            raise serializers.ValidationError(str(exc)) from exc
+            raise DRFPermissionDenied(str(exc)) from exc
 
         return Response(
             self.get_serializer(expense).data,
@@ -123,6 +127,6 @@ class ExpenseViewSet(
             )
 
         except PermissionDenied as exc:
-            raise serializers.ValidationError(str(exc)) from exc
+            raise DRFPermissionDenied(str(exc)) from exc
 
         return Response(status=status.HTTP_204_NO_CONTENT)

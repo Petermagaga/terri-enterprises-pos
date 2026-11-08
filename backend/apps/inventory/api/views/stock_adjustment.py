@@ -7,10 +7,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsOwner
+
 from apps.inventory.api.serializers import (
     StockAdjustmentSerializer,
-    StockAdjustmentMovementSerializer,
+    StockMovementSerializer,
 )
+
 from apps.inventory.services.stock_adjustment import adjust_stock
 
 
@@ -63,7 +65,7 @@ class StockAdjustmentView(APIView):
         response_data = {
             "movement_type": result["movement_type"],
             "quantity": result["quantity"],
-            "movements": StockAdjustmentMovementSerializer(
+            "movements": StockMovementSerializer(
                 movements,
                 many=True,
             ).data,
