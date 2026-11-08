@@ -88,9 +88,9 @@ def test_owner_can_view_stock_balances(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
-    stock = response.data[0]
+    stock = response.data["results"][0]
 
     assert stock["product_name"] == "Stock Test Water 500ml"
     assert stock["base_unit"] == "bottle"
@@ -133,7 +133,7 @@ def test_cashier_can_view_stock_balances(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
 
 # LOW STOCK CALCULATION TESTS

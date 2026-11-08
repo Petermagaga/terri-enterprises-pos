@@ -14,6 +14,6 @@ class StockBalanceViewSet(
 
     queryset = InventoryBalance.objects.select_related(
         "product",
-    ).all()
+    ).order_by("pk")
 
     permission_classes = [IsOwnerOrCashier]

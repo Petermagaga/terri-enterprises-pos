@@ -170,8 +170,8 @@ def test_owner_can_view_purchase_items(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["product_name"] == "Cooking Oil 1L"
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["product_name"] == "Cooking Oil 1L"
 
 
 @pytest.mark.django_db

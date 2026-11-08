@@ -97,9 +97,9 @@ def test_owner_can_view_stock_movements(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
-    movement = response.data[0]
+    movement = response.data['results'][0]
 
     assert movement["product_name"] == "Movement Test Water 500ml"
     assert movement["product_sku"] == stock_movement.product.sku
@@ -145,7 +145,7 @@ def test_cashier_can_view_stock_movements(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
 
 # DATA PROTECTION TESTS

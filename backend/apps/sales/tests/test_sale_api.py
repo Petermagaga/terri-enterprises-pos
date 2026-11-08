@@ -184,8 +184,9 @@ def test_owner_can_view_all_sales(
     response = api_client.get(reverse("sale-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["id"] == cashier_sale.pk
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["id"] == cashier_sale.pk
 
 
 @pytest.mark.django_db
@@ -202,9 +203,9 @@ def test_cashier_can_view_only_their_own_sales(
     response = api_client.get(reverse("sale-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["id"] == own_sale.pk
-
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["id"] == own_sale.pk
 
 @pytest.mark.django_db
 def test_cashier_cannot_retrieve_another_cashiers_sale(
@@ -239,9 +240,10 @@ def test_cashier_cannot_view_sales_older_than_seven_days(
 
     response = api_client.get(reverse("sale-list"))
 
-    assert response.status_code == status.HTTP_200_OK
-
-    sale_ids = [item["id"] for item in response.data]
+    assert response.status_code == status.HTTP_200_OK    
+    sale_ids = [
+        item["id"] for item in response.data["results"]
+    ]
 
     assert recent_sale.pk in sale_ids
     assert old_sale.pk not in sale_ids

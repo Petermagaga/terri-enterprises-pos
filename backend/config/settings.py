@@ -184,7 +184,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # --------------------------------------------------
 # DJANGO REST FRAMEWORK
 # --------------------------------------------------
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -192,6 +191,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_PAGINATION_CLASS": (
+        "apps.core.pagination.StandardResultsSetPagination"
+    ),
+    "PAGE_SIZE": 20,
 }
 
 

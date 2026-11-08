@@ -138,9 +138,9 @@ def test_owner_can_view_expense_list(
     response = api_client.get(reverse("expense-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["id"] == sample_expense.pk
-
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["id"] == sample_expense.pk
 
 @pytest.mark.django_db
 def test_owner_can_retrieve_expense(

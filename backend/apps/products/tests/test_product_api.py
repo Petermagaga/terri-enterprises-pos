@@ -115,8 +115,9 @@ def test_cashier_can_view_product_catalogue(
     response = api_client.get(reverse("product-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["id"] == existing_product.pk
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["id"] == existing_product.pk
 
 
 @pytest.mark.django_db

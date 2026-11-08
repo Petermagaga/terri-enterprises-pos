@@ -168,8 +168,8 @@ def test_owner_can_view_packaging(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["name"] == "Carton"
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["name"] == "Carton"
 
 
 @pytest.mark.django_db

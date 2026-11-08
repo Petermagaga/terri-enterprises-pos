@@ -71,8 +71,9 @@ def test_cashier_can_view_categories(api_client, cashier, category):
     response = api_client.get(reverse("category-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["name"] == "Spreads"
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["name"] == "Spreads"
 
 
 @pytest.mark.django_db
@@ -163,8 +164,9 @@ def test_cashier_can_view_product_families(
     response = api_client.get(reverse("product-family-list"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["name"] == "Margarine"
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["name"] == "Margarine"
 
 
 @pytest.mark.django_db
