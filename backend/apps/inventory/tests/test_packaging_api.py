@@ -105,8 +105,10 @@ def test_unauthenticated_user_cannot_create_packaging(
 
 # CASHIER PERMISSION TESTS
 
+# CASHIER PERMISSION TESTS
+
 @pytest.mark.django_db
-def test_cashier_cannot_view_packaging(
+def test_cashier_can_view_packaging(
     api_client, cashier, packaging
 ):
     api_client.force_authenticate(user=cashier)
@@ -115,7 +117,27 @@ def test_cashier_cannot_view_packaging(
         reverse("inventory-packaging-list")
     )
 
-    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["name"] == "Carton"
+
+
+@pytest.mark.django_db
+def test_cashier_can_retrieve_packaging(
+    api_client, cashier, packaging
+):
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.get(
+        reverse(
+            "inventory-packaging-detail",
+            args=[packaging.pk],
+        )
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["name"] == "Carton"
+    assert response.data["conversion_factor"] == 12
 
 
 @pytest.mark.django_db
@@ -378,3 +400,39 @@ def test_used_packaging_conversion_factor_cannot_be_changed(
 
     packaging.refresh_from_db()
     assert packaging.conversion_factor == 12
+
+@pytest.mark.django_db
+def test_packaging_list_can_be_filtered_by_product(
+    api_client, cashier, product, packaging
+):
+    another_product = create_product(
+        name="Mineral Water 1L",
+        product_family=product.product_family,
+        category=product.category,
+        size_value="1",
+        size_unit="L",
+        base_unit="bottle",
+        retail_price="80.00",
+        wholesale_price="70.00",
+        reorder_level=10,
+    )
+
+    ProductPackaging.objects.create(
+        product=another_product,
+        name="Carton",
+        conversion_factor=12,
+        purchase_enabled=True,
+        sales_enabled=True,
+    )
+
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.get(
+        reverse("inventory-packaging-list"),
+        {"product": product.pk},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["product"] == product.pk
+    assert response.data["results"][0]["name"] == packaging.name
