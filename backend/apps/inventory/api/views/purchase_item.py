@@ -20,3 +20,12 @@ class PurchaseItemViewSet(
     ).all()
 
     permission_classes = [IsOwner]
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        purchase_id = self.request.query_params.get("purchase")
+
+        if purchase_id is not None:
+            queryset = queryset.filter(purchase_id=purchase_id)
+
+        return queryset

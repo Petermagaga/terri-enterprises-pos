@@ -77,7 +77,7 @@ export async function addPurchaseItem(payload: CreatePurchaseItemPayload) {
 }
 
 export async function getProductPackaging(productId: number) {
-  const response = await apiClient.get<ProductPackaging[]>(
+  const response = await apiClient.get<PaginatedResponse<ProductPackaging>>(
     `/inventory/packaging/?product=${productId}`,
   )
 
