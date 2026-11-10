@@ -148,6 +148,7 @@ export default function SuppliersPage() {
                   <th>Email</th>
                   <th>Address</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
@@ -187,6 +188,21 @@ export default function SuppliersPage() {
                         {supplier.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      className="icon-button"
+                      title="Edit supplier"
+                      onClick={() => {
+                        setSelectedSupplier(supplier)
+                        setShowSupplierForm(true)
+                      }}
+                    >
+                      <Pencil size={16} />
+                    </button>
+                  </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -225,11 +241,18 @@ export default function SuppliersPage() {
         </div>
       </div>
 
+
       {showSupplierForm && (
         <SupplierForm
-          onClose={() => setShowSupplierForm(false)}
+          supplier={selectedSupplier ?? undefined}
+          onClose={() => {
+            setShowSupplierForm(false)
+            setSelectedSupplier(null)
+          }}
         />
       )}
+
+
     </div>
   )
 }

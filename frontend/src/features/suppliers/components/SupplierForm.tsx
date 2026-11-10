@@ -223,6 +223,25 @@ export default function SupplierForm({
                 placeholder="Additional supplier information"
               />
             </label>
+
+            {supplier && (
+              <label>
+                Supplier Status
+                <select
+                  value={form.is_active ? 'true' : 'false'}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      is_active: event.target.value === 'true',
+                    }))
+                  }
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </label>
+            )}
+
           </div>
 
           {errorMessage && (
