@@ -9,9 +9,16 @@ import {
 } from 'lucide-react'
 
 import { useStockBalances } from './hooks/useInventory'
+import PurchaseList from './components/PurchaseList'
+import PurchaseForm from './components/PurchaseForm'
+import PurchaseDetails from './components/PurchaseDetails'
 
 export default function InventoryPage() {
   const [page, setPage] = useState(1)
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false)
+  const [selectedPurchaseId, setSelectedPurchaseId] = useState<number | null>(
+    null,
+  )
 
   const { data, isLoading, isError, error } = useStockBalances(page)
 
@@ -180,6 +187,40 @@ export default function InventoryPage() {
           </div>
         </div>
       </div>
+
+      <div className="purchase-section">
+        <div className="page-heading">
+          <div>
+            <span className="page-eyebrow">SUPPLIER OPERATIONS</span>
+            <h1>Purchasing</h1>
+            <p>Record supplier purchases and receive stock into inventory.</p>
+          </div>
+        </div>
+
+        <PurchaseList
+          onSelectPurchase={setSelectedPurchaseId}
+          onCreatePurchase={() => setShowPurchaseForm(true)}
+        />
+
+        {selectedPurchaseId !== null && (
+          <div className="purchase-details-section">
+            <PurchaseDetails
+              purchaseId={selectedPurchaseId}
+              onClose={() => setSelectedPurchaseId(null)}
+            />
+          </div>
+        )}
+      </div>
+
+      {showPurchaseForm && (
+        <PurchaseForm
+          onClose={() => setShowPurchaseForm(false)}
+          onSuccess={(purchaseId) => {
+            setShowPurchaseForm(false)
+            setSelectedPurchaseId(purchaseId)
+          }}
+        />
+      )}
     </div>
   )
 }

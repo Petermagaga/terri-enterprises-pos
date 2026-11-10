@@ -83,3 +83,16 @@ export async function getProductPackaging(productId: number) {
 
   return response.data
 }
+
+
+
+export async function createProductPackaging(
+  payload: Omit<ProductPackaging, 'id'>,
+) {
+  const response = await apiClient.post<ProductPackaging>(
+    '/inventory/packaging/',
+    payload,
+  )
+
+  return response.data
+}

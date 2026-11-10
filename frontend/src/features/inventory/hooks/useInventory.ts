@@ -20,6 +20,10 @@ import type {
   CreatePurchasePayload,
   CreatePurchaseItemPayload,
 } from '../inventory.types'
+import { createProductPackaging } from '../api/inventory.service'
+
+
+import type { ProductPackaging } from '../inventory.types'
 
 export function useStockBalances(page = 1) {
   return useQuery({
@@ -103,6 +107,22 @@ export function useReceivePurchase() {
         queryKey: ['purchase-items', purchase.id],
       })
       queryClient.invalidateQueries({ queryKey: ['stock-balances'] })
+    },
+  })
+}
+
+
+
+export function useCreateProductPackaging() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: Omit<ProductPackaging, 'id'>) =>
+      createProductPackaging(payload),
+    onSuccess: (packaging) => {
+      queryClient.invalidateQueries({
+        queryKey: ['product-packaging', packaging.product],
+      })
     },
   })
 }
