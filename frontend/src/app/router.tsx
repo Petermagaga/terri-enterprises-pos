@@ -7,6 +7,9 @@ import LoginPage from '../pages/LoginPage'
 import OwnerDashboardPage from '../features/dashboard/OwnerDashboardPage'
 import SalesPage from '../features/sales/salesPage'
 import CatalogueSetupPage from '../features/products/CatalogueSetupPage'
+import InventoryPage from '../features/inventory/InventoryPage'
+
+import SuppliersPage from '../features/suppliers/suppliersPage'
 
 function UnauthorizedPage() {
   return (
@@ -42,6 +45,8 @@ export const router = createBrowserRouter([
           { path: '/owner', element: <OwnerDashboardPage /> },
           { path: '/products', element: <ProductsPage /> },
           { path: '/catalogue-setup', element: <CatalogueSetupPage /> },
+          { path: '/inventory', element: <InventoryPage /> },
+          { path: '/suppliers', element: <SuppliersPage /> },
         ],
       },
     ],
