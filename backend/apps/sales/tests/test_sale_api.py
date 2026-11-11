@@ -83,6 +83,13 @@ def sale_with_item(cashier, product):
 
     return sale
 
+def mark_sale_completed(sale):
+    Sale.objects.filter(pk=sale.pk).update(
+        status=Sale.Status.COMPLETED,
+    )
+    sale.refresh_from_db()
+    return sale
+
 
 # AUTHENTICATION TESTS
 
@@ -179,6 +186,7 @@ def test_owner_can_view_all_sales(
     owner,
     cashier_sale,
 ):
+    mark_sale_completed(cashier_sale)
     api_client.force_authenticate(user=owner)
 
     response = api_client.get(reverse("sale-list"))
@@ -188,6 +196,69 @@ def test_owner_can_view_all_sales(
     assert len(response.data["results"]) == 1
     assert response.data["results"][0]["id"] == cashier_sale.pk
 
+@pytest.mark.django_db
+def test_owner_sales_list_excludes_drafts(
+    api_client,
+    owner,
+):
+    draft_sale = create_sale(processed_by=owner)
+    completed_sale = create_sale(processed_by=owner)
+
+    mark_sale_completed(completed_sale)
+
+    api_client.force_authenticate(user=owner)
+
+    response = api_client.get(reverse("sale-list"))
+
+    assert response.status_code == status.HTTP_200_OK
+
+    sale_ids = [
+        item["id"] for item in response.data["results"]
+    ]
+
+    assert completed_sale.pk in sale_ids
+    assert draft_sale.pk not in sale_ids
+    assert response.data["count"] == 1
+@pytest.mark.django_db
+def test_cashier_sales_list_excludes_drafts(
+    api_client,
+    cashier,
+):
+    draft_sale = create_sale(processed_by=cashier)
+    completed_sale = create_sale(processed_by=cashier)
+
+    mark_sale_completed(completed_sale)
+
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.get(reverse("sale-list"))
+
+    assert response.status_code == status.HTTP_200_OK
+
+    sale_ids = [
+        item["id"] for item in response.data["results"]
+    ]
+
+    assert completed_sale.pk in sale_ids
+    assert draft_sale.pk not in sale_ids
+    assert response.data["count"] == 1
+
+@pytest.mark.django_db
+def test_owner_can_retrieve_draft_sale(
+    api_client,
+    owner,
+):
+    draft_sale = create_sale(processed_by=owner)
+
+    api_client.force_authenticate(user=owner)
+
+    response = api_client.get(
+        reverse("sale-detail", args=[draft_sale.pk])
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["id"] == draft_sale.pk
+    assert response.data["status"] == Sale.Status.DRAFT
 
 @pytest.mark.django_db
 def test_cashier_can_view_only_their_own_sales(
@@ -195,8 +266,12 @@ def test_cashier_can_view_only_their_own_sales(
     cashier,
     another_cashier,
 ):
+
     own_sale = create_sale(processed_by=cashier)
-    create_sale(processed_by=another_cashier)
+    other_sale = create_sale(processed_by=another_cashier)
+
+    mark_sale_completed(own_sale)
+    mark_sale_completed(other_sale)
 
     api_client.force_authenticate(user=cashier)
 
@@ -228,9 +303,12 @@ def test_cashier_cannot_retrieve_another_cashiers_sale(
 def test_cashier_cannot_view_sales_older_than_seven_days(
     api_client,
     cashier,
-):
+):    
     recent_sale = create_sale(processed_by=cashier)
     old_sale = create_sale(processed_by=cashier)
+
+    mark_sale_completed(recent_sale)
+    mark_sale_completed(old_sale)
 
     Sale.objects.filter(pk=old_sale.pk).update(
         created_at=timezone.now() - timedelta(days=8)

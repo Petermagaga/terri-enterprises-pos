@@ -48,24 +48,32 @@ class SaleViewSet(
 
         Cashiers can access only their own sales
         created within the last seven days.
-        """
 
+        Draft sales are excluded from list responses,
+        but remain accessible through detail endpoints.
+        """
         queryset = super().get_queryset()
         user = self.request.user
 
         if user.role == "OWNER":
-            return queryset
+            pass
 
-        if user.role == "CASHIER":
+        elif user.role == "CASHIER":
             seven_days_ago = timezone.now() - timedelta(days=7)
-
-            return queryset.filter(
+            queryset = queryset.filter(
                 processed_by=user,
                 created_at__gte=seven_days_ago,
             )
 
-        return queryset.none()
+        else:
+            return queryset.none()
 
+        if self.action == "list":
+            queryset = queryset.exclude(
+                status=Sale.Status.DRAFT
+            )
+
+        return queryset
     def create(self, request, *args, **kwargs):
         """
         Create a draft sale for the authenticated user.

@@ -1,4 +1,4 @@
-
+import SalesHistoryPage from '../features/sales/SalesHistoryPage'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import ProductsPage from '../features/products/ProductsPage'
 import ProtectedRoute from '../auth/ProtectedRoute'
@@ -65,6 +65,7 @@ export const router = createBrowserRouter([
             path: '/sales',
             element: <SalesPage />,
           },
+          { path: '/sales-history', element: <SalesHistoryPage /> },
         ],
       },
     ],

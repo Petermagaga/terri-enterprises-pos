@@ -12,14 +12,14 @@ import type {
 
 export function useSales(page = 1) {
   return useQuery({
-    queryKey: ['sales', page],
+    queryKey: ['sales','list', page],
     queryFn: () => salesService.getSales(page),
   })
 }
 
 export function useSale(id: number) {
   return useQuery({
-    queryKey: ['sales', id],
+    queryKey: ['sales','detail', id],
     queryFn: () => salesService.getSale(id),
     enabled: id > 0,
   })
@@ -31,7 +31,7 @@ export function useCreateSale() {
   return useMutation({
     mutationFn: salesService.createSale,
     onSuccess: (sale) => {
-      queryClient.setQueryData(['sales', sale.id], sale)
+      queryClient.setQueryData(['sales', 'detail', sale.id], sale)
       queryClient.invalidateQueries({ queryKey: ['sales'] })
     },
   })
@@ -49,7 +49,7 @@ export function useAddSaleItem() {
       payload: AddSaleItemPayload
     }) => salesService.addItem(saleId, payload),
     onSuccess: (sale) => {
-      queryClient.setQueryData(['sales', sale.id], sale)
+      queryClient.setQueryData(['sales', 'detail', sale.id], sale)
       queryClient.invalidateQueries({ queryKey: ['sales'] })
     },
   })
@@ -67,7 +67,7 @@ export function useAddSalePayment() {
       payload: AddSalePaymentPayload
     }) => salesService.addPayment(saleId, payload),
     onSuccess: (sale) => {
-      queryClient.setQueryData(['sales', sale.id], sale)
+      queryClient.setQueryData(['sales', 'detail', sale.id], sale)
       queryClient.invalidateQueries({ queryKey: ['sales'] })
     },
   })
@@ -79,7 +79,7 @@ export function useCompleteSale() {
   return useMutation({
     mutationFn: salesService.completeSale,
     onSuccess: (sale) => {
-      queryClient.setQueryData(['sales', sale.id], sale)
+      queryClient.setQueryData(['sales', 'detail', sale.id], sale)
       queryClient.invalidateQueries({ queryKey: ['sales'] })
     },
   })

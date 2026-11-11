@@ -9,6 +9,7 @@ import {
   Receipt,
   BarChart3,
   Users,
+  History,
 } from 'lucide-react'
 
 import { useAuth } from '../../auth/AuthContext'
@@ -28,6 +29,13 @@ export default function Sidebar() {
       path: '/sales',
       icon: ShoppingCart,
     },
+
+    {
+      label: 'Sales History',
+      path: '/sales-history',
+      icon: History,
+    },
+    
     ...(isOwner
       ? [
           { label: 'Products', path: '/products', icon: Package },
