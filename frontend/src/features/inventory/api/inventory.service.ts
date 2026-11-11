@@ -76,6 +76,12 @@ export async function addPurchaseItem(payload: CreatePurchaseItemPayload) {
   return response.data
 }
 
+
+export async function deletePurchaseItem(id: number) {
+  await apiClient.delete(`/inventory/purchase-items/${id}/`)
+}
+
+
 export async function getProductPackaging(productId: number) {
   const response = await apiClient.get<PaginatedResponse<ProductPackaging>>(
     `/inventory/packaging/?product=${productId}`,

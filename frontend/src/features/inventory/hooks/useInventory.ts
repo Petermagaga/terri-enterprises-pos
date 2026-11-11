@@ -14,6 +14,7 @@ import {
   getPurchaseItemsForPurchase,
   addPurchaseItem,
   getProductPackaging,
+  deletePurchaseItem
 } from '../api/inventory.service'
 
 import type {
@@ -124,5 +125,23 @@ export function useCreateProductPackaging() {
         queryKey: ['product-packaging', packaging.product],
       })
     },
+  })
+}
+
+
+export function useDeletePurchaseItem() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (itemId: number) => deletePurchaseItem(itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['purchase-items'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['purchases'],
+      })
+    },
+
   })
 }

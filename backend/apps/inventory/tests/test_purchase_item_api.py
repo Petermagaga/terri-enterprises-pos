@@ -439,8 +439,9 @@ def test_purchase_item_cannot_be_updated(
     assert item.package_quantity == 2
 
 
+
 @pytest.mark.django_db
-def test_purchase_item_cannot_be_deleted(
+def test_purchase_item_can_be_deleted_from_draft_purchase(
     api_client, owner, purchase_item_data
 ):
     api_client.force_authenticate(user=owner)
@@ -451,6 +452,8 @@ def test_purchase_item_cannot_be_deleted(
         format="json",
     )
 
+    assert create_response.status_code == status.HTTP_201_CREATED
+
     item_id = create_response.data["id"]
 
     response = api_client.delete(
@@ -460,5 +463,38 @@ def test_purchase_item_cannot_be_deleted(
         )
     )
 
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert not PurchaseItem.objects.filter(pk=item_id).exists()
+
+
+@pytest.mark.django_db
+def test_purchase_item_cannot_be_deleted_from_received_purchase(
+    api_client, owner, purchase_item_data
+):
+    api_client.force_authenticate(user=owner)
+
+    create_response = api_client.post(
+        reverse("inventory-purchase-item-list"),
+        purchase_item_data,
+        format="json",
+    )
+
+    assert create_response.status_code == status.HTTP_201_CREATED
+
+    item_id = create_response.data["id"]
+
+    purchase = Purchase.objects.get(
+        pk=purchase_item_data["purchase"]
+    )
+    purchase.status = Purchase.Status.RECEIVED
+    purchase.save()
+
+    response = api_client.delete(
+        reverse(
+            "inventory-purchase-item-detail",
+            args=[item_id],
+        )
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert PurchaseItem.objects.filter(pk=item_id).exists()

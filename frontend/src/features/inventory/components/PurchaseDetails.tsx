@@ -5,6 +5,7 @@ import {
   usePurchase,
   usePurchaseItems,
   useReceivePurchase,
+  useDeletePurchaseItem,
 } from '../hooks/useInventory'
 
 import PurchaseItemForm from './PurchaseItemForm'
@@ -41,8 +42,48 @@ export default function PurchaseDetails({
   } = usePurchaseItems(purchaseId)
 
   const receivePurchaseMutation = useReceivePurchase()
-
+  const deletePurchaseItemMutation = useDeletePurchaseItem()
   const items = itemsData?.results ?? []
+
+
+  async function handleDeleteItem(
+    itemId: number,
+    productName: string,
+  ) {
+    if (
+      !window.confirm(
+        `Remove ${productName} from this purchase? This action cannot be undone.`,
+      )
+    ) {
+      return
+    }
+
+    setErrorMessage('')
+
+    try {
+      await deletePurchaseItemMutation.mutateAsync(itemId)
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const responseData = error.response?.data
+
+        if (typeof responseData === 'string') {
+          setErrorMessage(responseData)
+        } else if (responseData && typeof responseData === 'object') {
+          setErrorMessage(
+            Object.values(responseData)
+              .flat()
+              .map(String)
+              .join(' '),
+          )
+        } else {
+          setErrorMessage('Unable to remove this purchase item.')
+        }
+      } else {
+        setErrorMessage('Something went wrong. Please try again.')
+      }
+    }
+  }
+
 
   async function handleReceivePurchase() {
     if (
@@ -164,6 +205,9 @@ export default function PurchaseDetails({
                 <th>Line Subtotal</th>
                 <th>Transport</th>
                 <th>Landed Unit Cost</th>
+
+                
+                {purchase.status === 'DRAFT' && <th>Actions</th>}
               </tr>
             </thead>
 
@@ -182,6 +226,20 @@ export default function PurchaseDetails({
                   <td>
                     <strong>{formatCurrency(item.landed_unit_cost)}</strong>
                   </td>
+
+                  {purchase.status === 'DRAFT' && (
+                    <td>
+                      <button
+                        className="button-secondary"
+                        onClick={() =>
+                          handleDeleteItem(item.id, item.product_name)
+                        }
+                        disabled={deletePurchaseItemMutation.isPending}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

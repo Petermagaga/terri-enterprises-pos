@@ -498,6 +498,22 @@ export default function SalesPage() {
           <h2>Payment received</h2>
           <p>Sale completed successfully.</p>
 
+          <div className="sales-receipt-items">
+            <strong>{completedSale.items.length} items</strong>
+
+            {completedSale.items.map((item) => (
+              <div key={item.id} className="sales-receipt-item">
+                <span>
+                  {item.product_name_snapshot}
+                  {' · '}
+                  {item.base_quantity} {item.base_unit_snapshot}
+                </span>
+
+                <strong>{formatCurrency(Number(item.total_amount))}</strong>
+              </div>
+            ))}
+          </div>
+
           <div className="sales-receipt-number">
             <span>Receipt number</span>
             <strong>{completedSale.receipt_number}</strong>

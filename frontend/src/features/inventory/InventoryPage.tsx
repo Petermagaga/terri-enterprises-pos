@@ -12,6 +12,7 @@ import { useStockBalances } from './hooks/useInventory'
 import PurchaseList from './components/PurchaseList'
 import PurchaseForm from './components/PurchaseForm'
 import PurchaseDetails from './components/PurchaseDetails'
+import PackagingManager from './components/PackagingManager'
 
 export default function InventoryPage() {
   const [page, setPage] = useState(1)
@@ -211,6 +212,18 @@ export default function InventoryPage() {
           </div>
         )}
       </div>
+      
+    <div className="purchase-section">
+      <div className="page-heading">
+        <div>
+          <span className="page-eyebrow">PRODUCT CONFIGURATION</span>
+          <h1>Packaging Setup</h1>
+          <p>Configure package sizes for purchasing and selling products.</p>
+        </div>
+      </div>
+
+      <PackagingManager />
+    </div>
 
       {showPurchaseForm && (
         <PurchaseForm
