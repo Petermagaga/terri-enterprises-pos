@@ -8,7 +8,7 @@ import OwnerDashboardPage from '../features/dashboard/OwnerDashboardPage'
 import SalesPage from '../features/sales/salesPage'
 import CatalogueSetupPage from '../features/products/CatalogueSetupPage'
 import InventoryPage from '../features/inventory/InventoryPage'
-
+import ExpensesPage from '../features/expenses/ExpensesPage'
 import SuppliersPage from '../features/suppliers/suppliersPage'
 
 function UnauthorizedPage() {
@@ -47,6 +47,7 @@ export const router = createBrowserRouter([
           { path: '/catalogue-setup', element: <CatalogueSetupPage /> },
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/suppliers', element: <SuppliersPage /> },
+          { path: '/expenses', element: <ExpensesPage /> },
         ],
       },
     ],
