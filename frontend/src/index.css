@@ -2353,3 +2353,100 @@ a {
     padding: 15px;
   }
 }
+
+/* Profit & Loss Report */
+
+.report-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+}
+
+.report-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.report-filters select,
+.report-filters input {
+  min-width: 170px;
+  padding: 10px 12px;
+  color: var(--text-primary, #111827);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.profit-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 760px;
+  padding: 24px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+}
+
+.profit-breakdown h2 {
+  margin: 0 0 18px;
+  font-size: 18px;
+}
+
+.profit-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.profit-breakdown-row span {
+  color: var(--text-secondary, #6b7280);
+}
+
+.profit-breakdown-row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.profit-breakdown-total {
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.profit-breakdown-net {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border, #d1d5db);
+  border-bottom: 0;
+  font-size: 17px;
+}
+
+@media (max-width: 640px) {
+  .report-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .report-filters label,
+  .report-filters select,
+  .report-filters input {
+    width: 100%;
+  }
+
+  .profit-breakdown {
+    padding: 18px;
+  }
+}

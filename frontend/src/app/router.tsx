@@ -10,6 +10,7 @@ import CatalogueSetupPage from '../features/products/CatalogueSetupPage'
 import InventoryPage from '../features/inventory/InventoryPage'
 import ExpensesPage from '../features/expenses/ExpensesPage'
 import SuppliersPage from '../features/suppliers/suppliersPage'
+import ProfitLossPage from '../features/reports/ProfitLossPage'
 
 function UnauthorizedPage() {
   return (
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/suppliers', element: <SuppliersPage /> },
           { path: '/expenses', element: <ExpensesPage /> },
+          { path: '/reports', element: <ProfitLossPage /> },
         ],
       },
     ],
