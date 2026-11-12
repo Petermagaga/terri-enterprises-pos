@@ -11,6 +11,7 @@ import {
 
 import { useAuth } from '../../auth/AuthContext'
 import { useOwnerDashboard } from './useOwnerDashboard'
+import type { TopProduct } from './dashboard.types'
 
 function formatCurrency(value: number | string) {
   return new Intl.NumberFormat('en-KE', {
@@ -59,6 +60,41 @@ function StatCard({
   )
 }
 
+
+function TopProductsTable({ products }: { products: TopProduct[] }) {
+  return (
+    <div className="dashboard-table-wrapper">
+      <table className="dashboard-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Quantity sold</th>
+            <th>Revenue</th>
+            <th>Cost</th>
+            <th>Gross profit</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {products.map((product) => (
+            <tr key={product.product_id}>
+              <td>{product.product_name}</td>
+              <td>{product.product_sku}</td>
+              <td>{product.quantity_sold.toLocaleString('en-KE')}</td>
+              <td>{formatCurrency(product.revenue)}</td>
+              <td>{formatCurrency(product.cost_of_goods_sold)}</td>
+              <td>{formatCurrency(product.gross_profit)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+
+
 export default function OwnerDashboardPage() {
   const { user } = useAuth()
   const { data, isLoading, isError, refetch, isFetching } =
@@ -94,7 +130,7 @@ export default function OwnerDashboardPage() {
           <p className="dashboard-eyebrow">OWNER OVERVIEW</p>
           <h1>Good day, {user?.first_name || user?.username || 'Owner'}</h1>
           <p className="dashboard-subtitle">
-            Here is what is happening in your supermarket today.
+            Here is what is happening in your Shop today.
           </p>
         </div>
 
@@ -222,26 +258,25 @@ export default function OwnerDashboardPage() {
           />
         </div>
       </section>
-
-      <section className="dashboard-section">
-        <div className="section-heading">
-          <div>
-            <h2>Top-selling products</h2>
-            <p>Products performing best today</p>
-          </div>
+        
+    <section className="dashboard-section">
+      <div className="section-heading">
+        <div>
+          <h2>Top-performing products</h2>
+          <p>Today's products ranked by gross profit</p>
         </div>
+      </div>
 
-        {data.top_products.length === 0 ? (
-          <div className="dashboard-empty">
-            No product sales recorded for this period yet.
-          </div>
-        ) : (
-          <div className="dashboard-empty">
-            Product sales are available. We'll add the product breakdown
-            after confirming the API's top-product fields.
-          </div>
-        )}
-      </section>
+      {data.top_products.length === 0 ? (
+        <div className="dashboard-empty">
+          No product sales recorded for this period yet.
+        </div>
+      ) : (
+        <TopProductsTable products={data.top_products} />
+      )}
+    </section>
+
+
     </main>
   )
 }

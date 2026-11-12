@@ -5,6 +5,7 @@ import ProtectedRoute from '../auth/ProtectedRoute'
 import AppLayout from '../components/layout/AppLayout'
 import LoginPage from '../pages/LoginPage'
 import OwnerDashboardPage from '../features/dashboard/OwnerDashboardPage'
+import CashierDashboardPage from '../features/dashboard/CashierDashboardPage'
 import SalesPage from '../features/sales/salesPage'
 import CatalogueSetupPage from '../features/products/CatalogueSetupPage'
 import InventoryPage from '../features/inventory/InventoryPage'
@@ -24,9 +25,6 @@ function UnauthorizedPage() {
   )
 }
 
-function CashierDashboard() {
-  return <h1>Cashier Dashboard</h1>
-}
 
 export const router = createBrowserRouter([
   {
@@ -78,10 +76,12 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
+
           {
             path: '/cashier',
-            element: <CashierDashboard />,
+            element: <CashierDashboardPage />,
           },
+
           {
             path: '/sales',
             element: <SalesPage />,
