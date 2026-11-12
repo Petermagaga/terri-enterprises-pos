@@ -3,11 +3,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.accounts.api.serializers.auth import UserSerializer
+
 from apps.accounts.api.serializers.cashiers import (
     CashierCreateSerializer,
     CashierPasswordResetSerializer,
     CashierUpdateSerializer,
+    CashierSerializer,
+    
 )
 from apps.accounts.models import User
 from apps.accounts.permissions import IsOwner
@@ -35,7 +37,7 @@ class CashierViewSet(viewsets.ModelViewSet):
         if self.action == "reset_password":
             return CashierPasswordResetSerializer
 
-        return UserSerializer
+        return CashierSerializer
 
     def perform_update(self, serializer):
         cashier = self.get_object()

@@ -51,3 +51,17 @@ class CashierPasswordResetSerializer(serializers.Serializer):
         trim_whitespace=False,
         style={"input_type": "password"},
     )
+
+class CashierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "is_active",
+        ]
+        read_only_fields = fields
