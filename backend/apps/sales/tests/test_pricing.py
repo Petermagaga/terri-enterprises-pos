@@ -199,3 +199,84 @@ def test_pricing_rejects_packaging_disabled_for_sales(product, carton):
             quantity=1,
             packaging=carton,
         )
+
+
+def test_wholesale_rejects_quantity_below_minimum(product):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    with pytest.raises(
+        ValidationError,
+        match="Wholesale pricing requires at least 12",
+    ):
+        calculate_sale_item_pricing(
+            product=product,
+            pricing_type="WHOLESALE",
+            quantity=11,
+        )
+
+
+def test_wholesale_accepts_quantity_equal_to_minimum(product):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    result = calculate_sale_item_pricing(
+        product=product,
+        pricing_type="WHOLESALE",
+        quantity=12,
+    )
+
+    assert result["base_quantity"] == 12
+    assert result["total_amount"] == 2760
+
+
+def test_wholesale_accepts_one_carton_when_minimum_is_12(
+    product, carton
+):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    result = calculate_sale_item_pricing(
+        product=product,
+        pricing_type="WHOLESALE",
+        quantity=1,
+        packaging=carton,
+    )
+
+    assert result["base_quantity"] == 12
+    assert result["total_amount"] == 2760
+
+
+def test_wholesale_rejects_carton_below_minimum(product):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    small_packaging = ProductPackaging.objects.create(
+        product=product,
+        name="Pack of 6",
+        conversion_factor=6,
+        purchase_enabled=True,
+        sales_enabled=True,
+    )
+
+    with pytest.raises(ValidationError):
+        calculate_sale_item_pricing(
+            product=product,
+            pricing_type="WHOLESALE",
+            quantity=1,
+            packaging=small_packaging,
+        )
+
+
+def test_retail_remains_available_below_wholesale_minimum(product):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    result = calculate_sale_item_pricing(
+        product=product,
+        pricing_type="RETAIL",
+        quantity=1,
+    )
+
+    assert result["selling_price_per_package"] == 250
+    assert result["total_amount"] == 250

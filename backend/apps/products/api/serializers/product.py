@@ -28,6 +28,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "base_unit",
             "retail_price",
             "wholesale_price",
+            "wholesale_min_quantity",
             "reorder_level",
             "is_active",
             "created_at",

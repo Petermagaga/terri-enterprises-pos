@@ -17,9 +17,11 @@ def create_product(
     base_unit,
     retail_price,
     wholesale_price,
+    wholesale_min_quantity=1,
     brand="",
     reorder_level=0,
     is_active=True,
+
 ):
     """
     Create a product with an automatically generated, permanent SKU.
@@ -58,9 +60,11 @@ def create_product(
         base_unit=base_unit,
         retail_price=retail_price,
         wholesale_price=wholesale_price,
+        wholesale_min_quantity=wholesale_min_quantity,
         brand=brand,
         reorder_level=reorder_level,
         is_active=is_active,
+        
     )
 
     # Run field, choice, and uniqueness validation before saving.

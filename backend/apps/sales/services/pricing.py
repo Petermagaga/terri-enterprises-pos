@@ -56,10 +56,20 @@ def calculate_sale_item_pricing(
         packaging_name = packaging.name
         conversion_factor = packaging.conversion_factor
 
-    if pricing_type == "RETAIL":
-        base_unit_price = product.retail_price
-    else:
+    base_quantity = quantity * conversion_factor
+
+    if pricing_type == "WHOLESALE":
+        if base_quantity < product.wholesale_min_quantity:
+            raise ValidationError(
+                f"Wholesale pricing requires at least "
+                f"{product.wholesale_min_quantity} "
+                f"{product.base_unit}(s)."
+            )
+
         base_unit_price = product.wholesale_price
+    else:
+        base_unit_price = product.retail_price
+
 
     selling_price_per_package = (
         Decimal(str(base_unit_price)) * conversion_factor
@@ -77,5 +87,5 @@ def calculate_sale_item_pricing(
         "quantity": quantity,
         "selling_price_per_package": selling_price_per_package,
         "total_amount": total_amount,
-        "base_quantity": quantity * conversion_factor,
+        "base_quantity": base_quantity,
     }

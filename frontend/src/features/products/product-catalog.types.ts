@@ -21,7 +21,6 @@ export interface CreateCategoryPayload {
 export interface CreateProductFamilyPayload {
   name: string
 }
-
 export interface CreateProductPayload {
   name: string
   product_family: number
@@ -32,6 +31,8 @@ export interface CreateProductPayload {
   base_unit: string
   retail_price: string
   wholesale_price: string
+  wholesale_min_quantity: number
   reorder_level: number
   is_active: boolean
 }
+

@@ -58,6 +58,11 @@ class Product(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.00"))],
     )
+    wholesale_min_quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text="Minimum quantity in base units required for wholesale pricing.",
+    )
 
     reorder_level = models.PositiveIntegerField(default=0)
 

@@ -25,6 +25,7 @@ const initialForm = {
   base_unit: '',
   retail_price: '',
   wholesale_price: '',
+  wholesale_min_quantity: '1',
   reorder_level: '0',
 }
 
@@ -63,6 +64,7 @@ export default function ProductForm({ onClose }: ProductFormProps) {
       base_unit: form.base_unit.trim(),
       retail_price: form.retail_price,
       wholesale_price: form.wholesale_price,
+      wholesale_min_quantity: Number(form.wholesale_min_quantity),
       reorder_level: Number(form.reorder_level),
       is_active: true,
     }
@@ -272,6 +274,24 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                   }
                   placeholder="0.00"
                 />
+              </label>
+
+              <label>
+                Minimum Wholesale Quantity *
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  step="1"
+                  value={form.wholesale_min_quantity}
+                  onChange={(event) =>
+                    updateField('wholesale_min_quantity', event.target.value)
+                  }
+                  placeholder="e.g. 12"
+                />
+                <small>
+                  Minimum number of {form.base_unit.trim() || 'base units'} required for wholesale pricing.
+                </small>
               </label>
             </div>
 

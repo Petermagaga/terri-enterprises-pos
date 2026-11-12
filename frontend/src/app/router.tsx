@@ -1,21 +1,52 @@
-import SalesHistoryPage from '../features/sales/SalesHistoryPage'
+
+import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import ProductsPage from '../features/products/ProductsPage'
+
 import ProtectedRoute from '../auth/ProtectedRoute'
 import AppLayout from '../components/layout/AppLayout'
-import LoginPage from '../pages/LoginPage'
-import OwnerDashboardPage from '../features/dashboard/OwnerDashboardPage'
-import CashierDashboardPage from '../features/dashboard/CashierDashboardPage'
-import SalesPage from '../features/sales/salesPage'
-import CatalogueSetupPage from '../features/products/CatalogueSetupPage'
-import InventoryPage from '../features/inventory/InventoryPage'
-import ExpensesPage from '../features/expenses/ExpensesPage'
-import SuppliersPage from '../features/suppliers/suppliersPage'
-import ProfitLossPage from '../features/reports/ProfitLossPage'
-import ProductProfitabilityPage from '../features/reports/ProductProfitabilityPage'
-import PaymentSummaryPage from '../features/reports/PaymentSummaryPage'
-import SalesSummaryPage from '../features/reports/SalesSummaryPage'
 
+// Lazy-loaded pages
+const LoginPage = lazy(() => import('../pages/LoginPage'))
+const OwnerDashboardPage = lazy(
+  () => import('../features/dashboard/OwnerDashboardPage'),
+)
+const CashierDashboardPage = lazy(
+  () => import('../features/dashboard/CashierDashboardPage'),
+)
+const SalesPage = lazy(() => import('../features/sales/salesPage'))
+const SalesHistoryPage = lazy(
+  () => import('../features/sales/SalesHistoryPage'),
+)
+const ProductsPage = lazy(
+  () => import('../features/products/ProductsPage'),
+)
+const CatalogueSetupPage = lazy(
+  () => import('../features/products/CatalogueSetupPage'),
+)
+const InventoryPage = lazy(
+  () => import('../features/inventory/InventoryPage'),
+)
+const ExpensesPage = lazy(
+  () => import('../features/expenses/ExpensesPage'),
+)
+const SuppliersPage = lazy(
+  () => import('../features/suppliers/suppliersPage'),
+)
+const ProfitLossPage = lazy(
+  () => import('../features/reports/ProfitLossPage'),
+)
+const ProductProfitabilityPage = lazy(
+  () => import('../features/reports/ProductProfitabilityPage'),
+)
+const PaymentSummaryPage = lazy(
+  () => import('../features/reports/PaymentSummaryPage'),
+)
+const SalesSummaryPage = lazy(
+  () => import('../features/reports/SalesSummaryPage'),
+)
+const CashiersPage = lazy(
+  () => import('../features/cashiers/CashiersPage'),
+)
 
 function UnauthorizedPage() {
   return (
@@ -24,7 +55,6 @@ function UnauthorizedPage() {
     </h1>
   )
 }
-
 
 export const router = createBrowserRouter([
   {
@@ -60,12 +90,11 @@ export const router = createBrowserRouter([
             path: '/payment-summary',
             element: <PaymentSummaryPage />,
           },
-
           {
             path: '/sales-summary',
             element: <SalesSummaryPage />,
-          },          
-
+          },
+          { path: '/cashiers', element: <CashiersPage /> },
         ],
       },
     ],
@@ -76,16 +105,8 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-
-          {
-            path: '/cashier',
-            element: <CashierDashboardPage />,
-          },
-
-          {
-            path: '/sales',
-            element: <SalesPage />,
-          },
+          { path: '/cashier', element: <CashierDashboardPage /> },
+          { path: '/sales', element: <SalesPage /> },
           { path: '/sales-history', element: <SalesHistoryPage /> },
         ],
       },

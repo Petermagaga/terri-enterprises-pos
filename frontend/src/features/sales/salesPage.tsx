@@ -160,6 +160,12 @@ export default function SalesPage() {
   const conversionFactor = selectedPackaging?.conversion_factor ?? 1
   const packagePrice = unitPrice * conversionFactor
 
+  const selectedBaseQuantity = quantity * conversionFactor
+
+  const canUseWholesale = selectedProduct
+    ? selectedBaseQuantity >= selectedProduct.wholesale_min_quantity
+    : false
+
   const cartTotal = money(cart.reduce((sum, item) => sum + item.total, 0))
   const cartUnits = cart.reduce(
     (sum, item) =>
@@ -177,6 +183,7 @@ export default function SalesPage() {
     if (checkoutLocked) return
 
     setSelectedProduct(product)
+    setPricingType('RETAIL')
     setSelectedPackagingId(null)
     setQuantity(1)
   }
@@ -215,12 +222,37 @@ export default function SalesPage() {
         if (itemIndex !== index) return item
 
         const nextQuantity = item.quantity + change
+
         if (nextQuantity < 1) return item
+
+        const conversionFactor =
+          item.packaging?.conversion_factor ?? 1
+
+        const nextBaseQuantity = nextQuantity * conversionFactor
+
+        const nextPricingType: PricingType =
+          item.pricingType === 'WHOLESALE' &&
+          nextBaseQuantity < item.product.wholesale_min_quantity
+            ? 'RETAIL'
+            : item.pricingType
+
+        const nextUnitPrice = Number(
+          nextPricingType === 'WHOLESALE'
+            ? item.product.wholesale_price
+            : item.product.retail_price,
+        )
+
+        const nextPackagePrice = money(
+          nextUnitPrice * conversionFactor,
+        )
 
         return {
           ...item,
+          pricingType: nextPricingType,
           quantity: nextQuantity,
-          total: money(item.packagePrice * nextQuantity),
+          unitPrice: nextUnitPrice,
+          packagePrice: nextPackagePrice,
+          total: money(nextPackagePrice * nextQuantity),
         }
       }),
     )
@@ -612,27 +644,56 @@ export default function SalesPage() {
 
                 <label className="sales-field">
                   <span>Pricing type</span>
-                  <select
-                    value={pricingType}
-                    onChange={(event) =>
-                      setPricingType(event.target.value as PricingType)
-                    }
-                    disabled={checkoutLocked}
-                  >
-                    <option value="RETAIL">Retail</option>
-                    <option value="WHOLESALE">Wholesale</option>
-                  </select>
+
+              <select
+                value={pricingType}
+                onChange={(event) =>
+                  setPricingType(event.target.value as PricingType)
+                }
+                disabled={checkoutLocked}
+              >
+                <option value="RETAIL">Retail</option>
+                <option value="WHOLESALE" disabled={!canUseWholesale}>
+                  Wholesale
+                </option>
+              </select>
+
+              <small>
+                {canUseWholesale
+                  ? `Wholesale available from ${selectedProduct.wholesale_min_quantity} ${selectedProduct.base_unit}(s).`
+                  : `Wholesale requires at least ${selectedProduct.wholesale_min_quantity} ${selectedProduct.base_unit}(s).`}
+              </small>
                 </label>
 
                 <label className="sales-field">
                   <span>Packaging</span>
                   <select
                     value={selectedPackagingId ?? ''}
-                    onChange={(event) =>
-                      setSelectedPackagingId(
-                        event.target.value ? Number(event.target.value) : null,
+
+              
+                    onChange={(event) => {
+                      const nextPackagingId = event.target.value
+                        ? Number(event.target.value)
+                        : null
+
+                      const nextPackaging = packagingOptions.find(
+                        (item) => item.id === nextPackagingId,
                       )
-                    }
+
+                      const nextConversionFactor =
+                        nextPackaging?.conversion_factor ?? 1
+
+                      const nextBaseQuantity = quantity * nextConversionFactor
+
+                      if (
+                        nextBaseQuantity < selectedProduct.wholesale_min_quantity
+                      ) {
+                        setPricingType('RETAIL')
+                      }
+
+                      setSelectedPackagingId(nextPackagingId)
+                    }}
+
                     disabled={packagingLoading || checkoutLocked}
                   >
                     <option value="">
@@ -654,9 +715,24 @@ export default function SalesPage() {
                     min="1"
                     step="1"
                     value={quantity}
-                    onChange={(event) =>
-                      setQuantity(Math.max(1, Number(event.target.value) || 1))
-                    }
+
+                    onChange={(event) => {
+                      const nextQuantity = Math.max(
+                        1,
+                        Number(event.target.value) || 1,
+                      )
+
+                      const nextBaseQuantity = nextQuantity * conversionFactor
+
+                      if (
+                        nextBaseQuantity < selectedProduct.wholesale_min_quantity
+                      ) {
+                        setPricingType('RETAIL')
+                      }
+
+                      setQuantity(nextQuantity)
+                    }}
+
                     disabled={checkoutLocked}
                   />
                 </label>

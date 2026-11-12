@@ -429,3 +429,61 @@ def test_cannot_complete_unpaid_sale(
     assert StockMovement.objects.filter(
         movement_type=StockMovement.MovementType.SALE,
     ).count() == 0
+
+@pytest.mark.django_db
+def test_api_rejects_wholesale_below_minimum(
+    api_client,
+    cashier,
+    product,
+):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    sale = create_sale(processed_by=cashier)
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.post(
+        reverse("sale-add-item", args=[sale.pk]),
+        {
+            "product": product.pk,
+            "pricing_type": "WHOLESALE",
+            "quantity": 11,
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    sale.refresh_from_db()
+    assert sale.items.count() == 0
+    assert sale.total_amount == Decimal("0.00")
+
+
+@pytest.mark.django_db
+def test_api_allows_retail_below_wholesale_minimum(
+    api_client,
+    cashier,
+    product,
+):
+    product.wholesale_min_quantity = 12
+    product.save()
+
+    sale = create_sale(processed_by=cashier)
+    api_client.force_authenticate(user=cashier)
+
+    response = api_client.post(
+        reverse("sale-add-item", args=[sale.pk]),
+        {
+            "product": product.pk,
+            "pricing_type": "RETAIL",
+            "quantity": 2,
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["total_amount"] == "500.00"
+
+    sale.refresh_from_db()
+    assert sale.items.count() == 1
+    assert sale.total_amount == Decimal("500.00")
