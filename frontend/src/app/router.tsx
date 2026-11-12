@@ -11,6 +11,10 @@ import InventoryPage from '../features/inventory/InventoryPage'
 import ExpensesPage from '../features/expenses/ExpensesPage'
 import SuppliersPage from '../features/suppliers/suppliersPage'
 import ProfitLossPage from '../features/reports/ProfitLossPage'
+import ProductProfitabilityPage from '../features/reports/ProductProfitabilityPage'
+import PaymentSummaryPage from '../features/reports/PaymentSummaryPage'
+import SalesSummaryPage from '../features/reports/SalesSummaryPage'
+
 
 function UnauthorizedPage() {
   return (
@@ -50,6 +54,20 @@ export const router = createBrowserRouter([
           { path: '/suppliers', element: <SuppliersPage /> },
           { path: '/expenses', element: <ExpensesPage /> },
           { path: '/reports', element: <ProfitLossPage /> },
+          {
+            path: '/product-profitability',
+            element: <ProductProfitabilityPage />,
+          },
+          {
+            path: '/payment-summary',
+            element: <PaymentSummaryPage />,
+          },
+
+          {
+            path: '/sales-summary',
+            element: <SalesSummaryPage />,
+          },          
+
         ],
       },
     ],

@@ -182,3 +182,87 @@
     border-right-color: var(--border);
   }
 }
+
+
+
+
+/* Product Profitability Report */
+
+.report-sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.report-sort select {
+  padding: 9px 12px;
+  color: var(--text-primary, #111827);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.report-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+}
+
+.report-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.report-table th,
+.report-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  white-space: nowrap;
+}
+
+.report-table th {
+  color: var(--text-secondary, #6b7280);
+  background: var(--surface-secondary, #f9fafb);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.report-table td {
+  color: var(--text-primary, #111827);
+  font-size: 13px;
+}
+
+.report-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.report-product-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.report-profit-value {
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .report-sort {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .report-sort select {
+    width: 100%;
+  }
+}
+

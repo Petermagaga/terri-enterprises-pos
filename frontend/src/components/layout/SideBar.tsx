@@ -10,6 +10,8 @@ import {
   BarChart3,
   Users,
   History,
+  TrendingUp,
+  Banknote,
 } from 'lucide-react'
 
 import { useAuth } from '../../auth/AuthContext'
@@ -35,7 +37,7 @@ export default function Sidebar() {
       path: '/sales-history',
       icon: History,
     },
-    
+
     ...(isOwner
       ? [
           { label: 'Products', path: '/products', icon: Package },
@@ -44,6 +46,23 @@ export default function Sidebar() {
           { label: 'Expenses', path: '/expenses', icon: Receipt },
           { label: 'Reports', path: '/reports', icon: BarChart3 },
           { label: 'Cashiers', path: '/cashiers', icon: Users },
+          {
+            label: 'Product Profitability',
+            path: '/product-profitability',
+            icon: TrendingUp,
+          },
+
+          {
+            label: 'Payment Summary',
+            path: '/payment-summary',
+            icon: Banknote,
+          },
+          {
+            label: 'Sales Summary',
+            path: '/sales-summary',
+            icon: BarChart3,
+          },
+
         ]
       : []),
   ]
