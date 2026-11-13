@@ -77,7 +77,7 @@ export default function ProductProfitabilityPage() {
   const { data, isLoading, isError, refetch, isFetching } =
     useProductProfitability(query, customRangeValid)
 
-  const products = data?.data ?? []
+  const products = useMemo(() => data?.data ?? [], [data?.data])
 
   const totals = useMemo(() => {
     return products.reduce(

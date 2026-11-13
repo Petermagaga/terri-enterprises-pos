@@ -29,7 +29,7 @@ export default function ProductsPage() {
   const [showProductForm, setShowProductForm] = useState(false)
   const { data, isLoading, isError, error } = useProducts(page)
 
-  const products = data?.results ?? []
+  const products = useMemo(() => data?.results ?? [], [data?.results])
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase()

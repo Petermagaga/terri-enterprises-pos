@@ -93,7 +93,10 @@ function getPaidAmount(sale: Sale) {
 
 export default function SalesPage() {
   const { data: productsData, isLoading, isError } = useProducts()
-  const products = productsData?.results ?? []
+  const products = useMemo(
+  () => productsData?.results ?? [],
+  [productsData?.results],
+)
 
   const createSale = useCreateSale()
   const addSaleItem = useAddSaleItem()

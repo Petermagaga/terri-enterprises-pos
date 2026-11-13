@@ -1,60 +1,26 @@
 
-import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import ProtectedRoute from '../auth/ProtectedRoute'
 import AppLayout from '../components/layout/AppLayout'
 
-// Lazy-loaded pages
-const LoginPage = lazy(() => import('../pages/LoginPage'))
-const OwnerDashboardPage = lazy(
-  () => import('../features/dashboard/OwnerDashboardPage'),
-)
-const CashierDashboardPage = lazy(
-  () => import('../features/dashboard/CashierDashboardPage'),
-)
-const SalesPage = lazy(() => import('../features/sales/salesPage'))
-const SalesHistoryPage = lazy(
-  () => import('../features/sales/SalesHistoryPage'),
-)
-const ProductsPage = lazy(
-  () => import('../features/products/ProductsPage'),
-)
-const CatalogueSetupPage = lazy(
-  () => import('../features/products/CatalogueSetupPage'),
-)
-const InventoryPage = lazy(
-  () => import('../features/inventory/InventoryPage'),
-)
-const ExpensesPage = lazy(
-  () => import('../features/expenses/ExpensesPage'),
-)
-const SuppliersPage = lazy(
-  () => import('../features/suppliers/suppliersPage'),
-)
-const ProfitLossPage = lazy(
-  () => import('../features/reports/ProfitLossPage'),
-)
-const ProductProfitabilityPage = lazy(
-  () => import('../features/reports/ProductProfitabilityPage'),
-)
-const PaymentSummaryPage = lazy(
-  () => import('../features/reports/PaymentSummaryPage'),
-)
-const SalesSummaryPage = lazy(
-  () => import('../features/reports/SalesSummaryPage'),
-)
-const CashiersPage = lazy(
-  () => import('../features/cashiers/CashiersPage'),
-)
-
-function UnauthorizedPage() {
-  return (
-    <h1>
-      Access denied. You do not have permission to view this page.
-    </h1>
-  )
-}
+import {
+  LoginPage,
+  OwnerDashboardPage,
+  CashierDashboardPage,
+  SalesPage,
+  SalesHistoryPage,
+  ProductsPage,
+  CatalogueSetupPage,
+  InventoryPage,
+  ExpensesPage,
+  SuppliersPage,
+  ProfitLossPage,
+  ProductProfitabilityPage,
+  PaymentSummaryPage,
+  SalesSummaryPage,
+  CashiersPage,
+} from './routePages'
 
 export const router = createBrowserRouter([
   {
@@ -67,7 +33,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/unauthorized',
-    element: <UnauthorizedPage />,
+    element: (
+      <h1>
+        Access denied. You do not have permission to view this page.
+      </h1>
+    ),
   },
   {
     element: <ProtectedRoute allowedRoles={['OWNER']} />,

@@ -22,7 +22,10 @@ export default function SuppliersPage() {
 
   const { data, isLoading, isError, error } = useSuppliers(page)
 
-  const suppliers = data?.results ?? []
+  const suppliers = useMemo(
+  () => data?.results ?? [],
+  [data?.results],
+)
 
   const filteredSuppliers = useMemo(() => {
     const term = search.trim().toLowerCase()

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LockKeyhole, Store } from 'lucide-react'
 
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 
 export default function LoginPage() {
   const { login } = useAuth()

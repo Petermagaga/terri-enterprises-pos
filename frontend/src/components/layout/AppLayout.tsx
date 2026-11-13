@@ -2,8 +2,7 @@ import Sidebar from './SideBar'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 
-import { useAuth } from '../../auth/AuthContext'
-
+import { useAuth } from '../../auth/useAuth'
 export default function AppLayout() {
 
 

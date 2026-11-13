@@ -14,8 +14,7 @@ import {
   Banknote,
 } from 'lucide-react'
 
-import { useAuth } from '../../auth/AuthContext'
-
+import { useAuth } from '../../auth/useAuth'
 export default function Sidebar() {
   const { user } = useAuth()
   const isOwner = user?.role === 'OWNER'

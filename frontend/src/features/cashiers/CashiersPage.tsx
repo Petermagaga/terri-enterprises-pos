@@ -33,7 +33,7 @@ export default function CashiersPage() {
   const deactivateCashier = useDeactivateCashier()
   const updateCashier = useUpdateCashier()
 
-  const cashiers = data?.results ?? []
+  const cashiers = useMemo(() => data?.results ?? [], [data?.results])
 
   const filteredCashiers = useMemo(() => {
     const term = search.trim().toLowerCase()

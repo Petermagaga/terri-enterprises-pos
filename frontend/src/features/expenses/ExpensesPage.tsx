@@ -42,8 +42,8 @@ export default function ExpensesPage() {
   const { data, isLoading, isError, error } = useExpenses(page)
   const deleteExpense = useDeleteExpense()
 
-  const expenses = data?.results ?? []
 
+  const expenses = useMemo(() => data?.results ?? [], [data?.results])
   const filteredExpenses = useMemo(() => {
     const term = search.trim().toLowerCase()
 

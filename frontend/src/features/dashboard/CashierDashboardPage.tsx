@@ -8,7 +8,7 @@ import {
   Wallet,
 } from 'lucide-react'
 
-import { useAuth } from '../../auth/AuthContext'
+import { useAuth } from '../../auth/useAuth'
 import { useCashierDashboard } from './useCashierDashboard'
 
 function formatCurrency(value: number | string) {

@@ -9,7 +9,8 @@ import {
   Wallet,
 } from 'lucide-react'
 
-import { useAuth } from '../../auth/AuthContext'
+import { useAuth } from '../../auth/useAuth'
+
 import { useOwnerDashboard } from './useOwnerDashboard'
 import type { TopProduct } from './dashboard.types'
 

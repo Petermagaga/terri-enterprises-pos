@@ -112,7 +112,7 @@ export default function SalesSummaryPage() {
   const { data, isLoading, isError, refetch, isFetching } =
     useSalesSummary(query, customRangeValid)
 
-  const report = data?.data ?? []
+  const report = useMemo(() => data?.data ?? [], [data?.data])
 
   const totals = useMemo(() => {
     return report.reduce(
