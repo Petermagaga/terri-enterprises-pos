@@ -554,8 +554,12 @@ a {
 .sidebar-navigation {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 6px;
   padding-top: 25px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sidebar-label {
@@ -716,6 +720,9 @@ a {
   }
 
   .sidebar-navigation {
+    flex: initial;
+    min-height: auto;
+    overflow-y: visible;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 5px;
