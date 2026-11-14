@@ -23,6 +23,24 @@ function formatCurrency(value: number | string) {
   }).format(Number(value) || 0)
 }
 
+function getTimeBasedGreeting() {
+  const hour = new Date().getHours()
+
+  if (hour >= 5 && hour < 12) {
+    return 'Good morning'
+  }
+
+  if (hour >= 12 && hour < 17) {
+    return 'Good afternoon'
+  }
+
+  if (hour >= 17 && hour < 21) {
+    return 'Good evening'
+  }
+
+  return 'Goodnight'
+}
+
 function formatDate(value: string) {
   return new Date(`${value}T00:00:00`).toLocaleDateString('en-KE', {
     weekday: 'long',
@@ -129,7 +147,9 @@ export default function OwnerDashboardPage() {
       <header className="dashboard-header">
         <div>
           <p className="dashboard-eyebrow">OWNER OVERVIEW</p>
-          <h1>Good day, {user?.first_name || user?.username || 'Owner'}</h1>
+          <h1>
+            {getTimeBasedGreeting()}, {user?.first_name || user?.username || 'Owner'}
+          </h1>
           <p className="dashboard-subtitle">
             Here is what is happening in your Shop today.
           </p>
