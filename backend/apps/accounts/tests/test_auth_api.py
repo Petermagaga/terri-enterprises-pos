@@ -160,3 +160,102 @@ def test_logout_requires_authentication(api_client):
     response = api_client.post("/api/auth/logout/")
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+def test_owner_can_change_username(api_client, owner):
+    token = Token.objects.create(user=owner)
+    api_client.credentials(
+        HTTP_AUTHORIZATION=f"Token {token.key}"
+    )
+
+    response = api_client.patch(
+        "/api/auth/settings/",
+        {
+            "username": "new_owner_name",
+            "current_password": "TestPassword123!",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    owner.refresh_from_db()
+    assert owner.username == "new_owner_name"
+
+
+def test_cashier_can_change_password(api_client, cashier):
+    token = Token.objects.create(user=cashier)
+    api_client.credentials(
+        HTTP_AUTHORIZATION=f"Token {token.key}"
+    )
+
+    response = api_client.patch(
+        "/api/auth/settings/",
+        {
+            "current_password": "TestPassword123!",
+            "new_password": "NewSecurePassword456!",
+            "confirm_new_password": "NewSecurePassword456!",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    cashier.refresh_from_db()
+    assert cashier.check_password("NewSecurePassword456!")
+
+
+def test_account_settings_rejects_wrong_current_password(api_client, owner):
+    token = Token.objects.create(user=owner)
+    api_client.credentials(
+        HTTP_AUTHORIZATION=f"Token {token.key}"
+    )
+
+    response = api_client.patch(
+        "/api/auth/settings/",
+        {
+            "username": "changed_name",
+            "current_password": "WrongPassword123!",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    owner.refresh_from_db()
+    assert owner.username == "auth_owner"
+
+
+def test_account_settings_rejects_duplicate_username(api_client, owner, cashier):
+    token = Token.objects.create(user=owner)
+    api_client.credentials(
+        HTTP_AUTHORIZATION=f"Token {token.key}"
+    )
+
+    response = api_client.patch(
+        "/api/auth/settings/",
+        {
+            "username": cashier.username,
+            "current_password": "TestPassword123!",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_account_settings_rejects_mismatched_passwords(api_client, owner):
+    token = Token.objects.create(user=owner)
+    api_client.credentials(
+        HTTP_AUTHORIZATION=f"Token {token.key}"
+    )
+
+    response = api_client.patch(
+        "/api/auth/settings/",
+        {
+            "current_password": "TestPassword123!",
+            "new_password": "NewSecurePassword456!",
+            "confirm_new_password": "DifferentPassword789!",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    owner.refresh_from_db()
+    assert owner.check_password("TestPassword123!")

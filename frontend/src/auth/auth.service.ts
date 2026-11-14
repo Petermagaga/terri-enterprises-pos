@@ -20,11 +20,35 @@ export interface LoginResponse {
   user: AuthUser
 }
 
+export interface AccountSettingsPayload {
+  current_password: string
+  username?: string
+  new_password?: string
+  confirm_new_password?: string
+}
+
+export interface AccountSettingsResponse {
+  detail: string
+  user: AuthUser
+}
+
 export const authService = {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>(
       '/auth/login/',
       credentials,
+    )
+
+    return response.data
+  },
+
+
+  async updateAccountSettings(
+    payload: AccountSettingsPayload,
+  ): Promise<AccountSettingsResponse> {
+    const response = await apiClient.patch<AccountSettingsResponse>(
+      '/auth/settings/',
+      payload,
     )
 
     return response.data

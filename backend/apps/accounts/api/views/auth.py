@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from apps.accounts.api.serializers.auth import (
     LoginSerializer,
     UserSerializer,
+    AccountSettingsSerializer
 )
 from apps.accounts.services.tokens import (
     get_user_token,
@@ -58,5 +59,27 @@ class CurrentUserView(APIView):
     def get(self, request):
         return Response(
             UserSerializer(request.user).data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class AccountSettingsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        serializer = AccountSettingsSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        return Response(
+            {
+                "detail": "Account settings updated successfully.",
+                "user": UserSerializer(user).data,
+            },
             status=status.HTTP_200_OK,
         )

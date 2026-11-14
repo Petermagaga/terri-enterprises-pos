@@ -5,8 +5,11 @@ import {
   type ReactNode,
 } from 'react'
 
+
+
 import {
   authService,
+  type AccountSettingsPayload,
   type AuthUser,
   type LoginCredentials,
 } from './auth.service'
@@ -55,6 +58,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return response.user
   }
 
+  const updateAccountSettings = async (
+    payload: AccountSettingsPayload,
+  ): Promise<AuthUser> => {
+    const response = await authService.updateAccountSettings(payload)
+    setUser(response.user)
+
+    return response.user
+  }
+
+
   const logout = async (): Promise<void> => {
     try {
       await authService.logout()
@@ -71,6 +84,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isLoading,
         isAuthenticated: user !== null,
         login,
+        updateAccountSettings,
         logout,
       }}
     >

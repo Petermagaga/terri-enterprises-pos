@@ -6,6 +6,7 @@ from apps.accounts.api.views.auth import (
     LoginView,
     LogoutView,
     CurrentUserView,
+    AccountSettingsView
 )
 from apps.accounts.api.views.cashiers import CashierViewSet
 
@@ -19,4 +20,5 @@ urlpatterns = [
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", CurrentUserView.as_view(), name="auth-me"),
     path("", include(router.urls)),
+    path("auth/settings/", AccountSettingsView.as_view(), name="auth-settings"),
 ]
