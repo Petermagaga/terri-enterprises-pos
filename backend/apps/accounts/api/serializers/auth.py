@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-
+from django.core.exceptions import ValidationError as DjangoValidationError
 from apps.accounts.models import User
 
 class LoginSerializer(serializers.Serializer):
@@ -101,14 +101,10 @@ class AccountSettingsSerializer(serializers.ModelSerializer):
 
             try:
                 validate_password(new_password, user)
-            except Exception as exc:
-                from django.core.exceptions import ValidationError
-
-                if isinstance(exc, ValidationError):
-                    raise serializers.ValidationError({
-                        "new_password": list(exc.messages)
-                    })
-                raise
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({
+                    "new_password": list(exc.messages)
+                })
 
 
         elif confirm_password:
