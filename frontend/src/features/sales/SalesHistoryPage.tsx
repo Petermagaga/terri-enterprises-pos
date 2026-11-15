@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 
 import { useSales, useSale } from './hooks/useSales'
+import { downloadReceiptPdf } from './utils/salesPdf'
 import type { Sale, SaleStatus } from './sales.types'
 
 function formatCurrency(value: number | string) {
@@ -137,6 +138,18 @@ function SaleDetails({ sale }: { sale: Sale }) {
           Completed on {formatDate(sale.completed_at)}
         </p>
       )}
+
+      {sale.status === 'COMPLETED' && sale.receipt_number && (
+        <button
+          type="button"
+          className="sales-back-button"
+          onClick={() => void downloadReceiptPdf(sale)}
+        >
+          <Receipt size={17} />
+          Download receipt PDF
+        </button>
+      )}
+
     </section>
   )
 }

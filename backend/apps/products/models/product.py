@@ -10,6 +10,7 @@ class Product(models.Model):
         KILOGRAM = "KG", "Kilogram"
         MILLILITRE = "ML", "Millilitre"
         LITRE = "L", "Litre"
+        PIECE = "PCS", "Piece"
 
     name = models.CharField(max_length=150)
 
@@ -40,7 +41,7 @@ class Product(models.Model):
     )
 
     size_unit = models.CharField(
-        max_length=2,
+        max_length=3,
         choices=SizeUnit.choices,
     )
 

@@ -56,79 +56,361 @@ a {
 
 /* Login page */
 
+
+/* =========================================================
+   TERRI ENTERPRISES — PREMIUM POS LOGIN
+========================================================= */
+
 .login-page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 32px 20px;
+  box-sizing: border-box;
+
   background:
-    radial-gradient(circle at top left, #dcfce7 0, transparent 35%),
-    #f8fafc;
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(74, 205, 246, 0.16),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(0, 32, 96, 0.08),
+      transparent 35%
+    ),
+    #F4F8FC;
 }
 
+/* LOGIN CARD */
+
 .login-panel {
+  position: relative;
   width: 100%;
   max-width: 440px;
-  padding: 42px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.07);
+  padding: 38px 40px 30px;
+  box-sizing: border-box;
+
+  background: #FFFFFF;
+  border: 1px solid #D9E1F2;
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 32, 96, 0.09),
+    0 3px 12px rgba(0, 32, 96, 0.03);
+
+  overflow: hidden;
 }
+
+/* BRAND ACCENT */
+
+.login-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+
+  background: linear-gradient(
+    90deg,
+    #002060,
+    #4ACDF6,
+    #1F4E78
+  );
+}
+
+/* BRANDING */
 
 .login-brand {
   text-align: center;
-  margin-bottom: 38px;
+  margin-bottom: 32px;
 }
 
-.brand-icon {
-  width: 64px;
-  height: 64px;
+.login-logo {
+  width: 100%;
+  max-width: 220px;
+  height: 125px;
+  margin: 0 auto 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  color: white;
-  background: var(--primary);
-  border-radius: 16px;
+
+  background: #050B1D;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
-.login-brand h1 {
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.login-brand-name h1 {
   margin: 0;
-  color: var(--text-primary);
+  color: #002060;
   font-size: 25px;
-  font-weight: 750;
-  letter-spacing: -0.7px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
 }
 
-.login-brand p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-  font-size: 13px;
+.login-brand-name p {
+  margin: 7px 0 0;
+  color: #1F4E78;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
+
+/* WELCOME HEADING */
 
 .login-heading {
   margin-bottom: 26px;
 }
 
+.login-welcome-label {
+  display: inline-block;
+  margin-bottom: 10px;
+
+  color: #1F4E78;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
 .login-heading h2 {
   margin: 0 0 8px;
-  font-size: 22px;
-  font-weight: 700;
+  color: #002060;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
 }
 
 .login-heading p {
   margin: 0;
-  color: var(--text-secondary);
+  color: #808080;
   font-size: 14px;
+  line-height: 1.6;
 }
+
+/* FORM */
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field label {
+  color: #002060;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-field input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  box-sizing: border-box;
+
+  color: #002060;
+  background: #FFFFFF;
+
+  border: 1px solid #D9E1F2;
+  border-radius: 9px;
+
+  font-size: 14px;
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-field input::placeholder {
+  color: #A0AEC0;
+}
+
+.form-field input:hover {
+  border-color: #4ACDF6;
+}
+
+.form-field input:focus {
+  border-color: #4ACDF6;
+  background: #F9FDFF;
+
+  box-shadow: 0 0 0 3px rgba(74, 205, 246, 0.18);
+}
+
+/* ERROR */
+
+.login-error {
+  padding: 12px 14px;
+
+  color: #A12B2B;
+  background: #FCE8E6;
+
+  border: 1px solid #F2C5C1;
+  border-radius: 9px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* SIGN IN BUTTON */
+
+.login-button {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 4px;
+  padding: 12px 18px;
+
+  color: #FFFFFF;
+  background: #002060;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-button:hover:not(:disabled) {
+  background: #17365D;
+  transform: translateY(-1px);
+
+  box-shadow: 0 6px 16px rgba(0, 32, 96, 0.18);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-button:focus-visible {
+  outline: 3px solid rgba(74, 205, 246, 0.45);
+  outline-offset: 3px;
+}
+
+.login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* SECURITY NOTE */
+
+.login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin-top: 24px;
+
+  color: #808080;
+  font-size: 11px;
+}
+
+/* GAGAMATRIX CREDIT */
+
+.login-powered {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+
+  margin-top: 24px;
+  padding-top: 13px;
+
+  border-top: 1px solid #EDF1F7;
+
+  color: #A0A8B5;
+  font-size: 9px;
+  letter-spacing: 0.2px;
+}
+
+.login-powered strong {
+  color: #002060;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.login-powered strong span {
+  color: #4ACDF6;
+}
+
+.login-logo {
+  width: 100%;
+  max-width: 220px;
+  height: 125px;
+  margin: 0 auto 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 20px 14px;
+  }
+
+  .login-panel {
+    padding: 32px 24px 24px;
+    border-radius: 16px;
+  }
+
+  .login-logo {
+    max-width: 190px;
+    height: 110px;
+  }
+
+  .login-brand-name h1 {
+    font-size: 22px;
+  }
+
+  .login-heading h2 {
+    font-size: 23px;
+  }
+}
+
 
 .form-field {
   display: flex;
@@ -489,17 +771,60 @@ a {
   border-bottom: 1px solid var(--border);
 }
 
-.sidebar-brand-icon {
-  width: 43px;
-  height: 43px;
+/* =========================================================
+   TERRI ENTERPRISES — SIDEBAR BRANDING
+========================================================= */
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  padding: 0 8px 22px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  width: 100%;
+  height: 76px;
+
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: white;
-  background: var(--primary);
-  border-radius: 12px;
-  font-size: 23px;
+  justify-content: flex-start;
+
+  overflow: hidden;
+}
+
+.sidebar-logo img {
+  width: 100%;
+  max-width: 205px;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: left center;
+
+  display: block;
+}
+
+.sidebar-brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-brand-info span {
+  color: #002060;
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.sidebar-brand-info small {
+  color: #808080;
+  font-size: 10px;
+  font-weight: 500;
 }
 
 .sidebar-brand h2 {

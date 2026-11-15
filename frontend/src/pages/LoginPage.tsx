@@ -1,7 +1,8 @@
+
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { LockKeyhole, Store } from 'lucide-react'
+import { LockKeyhole } from 'lucide-react'
 
 import { useAuth } from '../auth/useAuth'
 
@@ -20,13 +21,13 @@ export default function LoginPage() {
     setIsSubmitting(true)
 
     try {
-        const user = await login({ username, password })
+      const user = await login({ username, password })
 
-        if (user.role === 'OWNER') {
+      if (user.role === 'OWNER') {
         navigate('/owner', { replace: true })
-        } else {
+      } else {
         navigate('/cashier', { replace: true })
-        }
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const responseData = err.response?.data
@@ -49,23 +50,40 @@ export default function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-panel">
+
+        {/* Business Branding */}
         <div className="login-brand">
-          <div className="brand-icon">
-            <Store size={30} />
+          <div className="login-logo">
+            <img
+              src="/terri-logo.png"
+              alt="TeRRi Enterprises"
+            />
           </div>
 
-          <h1>Terri Enterprises</h1>
-          <p>Supermarket Management System</p>
+          <div className="login-brand-name">
+            <h1>TeRRi Enterprises</h1>
+            <p>Wholesale · Retail · More for You</p>
+          </div>
         </div>
 
+        {/* Welcome */}
         <div className="login-heading">
+          <span className="login-welcome-label">
+            BUSINESS MANAGEMENT SYSTEM
+          </span>
+
           <h2>Welcome back</h2>
-          <p>Sign in to access your POS account.</p>
+
+          <p>
+            Sign in to manage your business operations.
+          </p>
         </div>
 
+        {/* Authentication Form */}
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-field">
             <label htmlFor="username">Username</label>
+
             <input
               id="username"
               type="text"
@@ -79,6 +97,7 @@ export default function LoginPage() {
 
           <div className="form-field">
             <label htmlFor="password">Password</label>
+
             <input
               id="password"
               type="password"
@@ -102,13 +121,25 @@ export default function LoginPage() {
             disabled={isSubmitting}
           >
             <LockKeyhole size={18} />
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+
+            <span>
+              {isSubmitting ? 'Signing in...' : 'Sign in to your account'}
+            </span>
           </button>
         </form>
 
-        <p className="login-footer">
-          Secure access for authorised staff only.
-        </p>
+        {/* Security Note */}
+        <div className="login-security">
+          <LockKeyhole size={14} />
+          <span>Secure access for authorised staff only</span>
+        </div>
+
+        {/* Subtle Developer Credit */}
+        <div className="login-powered">
+          <span>Powered by</span>
+          <strong>GAGA<span>MATRIX</span></strong>
+        </div>
+
       </section>
     </main>
   )

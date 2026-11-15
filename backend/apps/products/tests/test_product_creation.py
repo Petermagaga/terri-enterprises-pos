@@ -57,6 +57,21 @@ def test_product_creation_does_not_require_a_manual_sku(
 
     assert product.sku == "MARG-500G"
 
+def test_piece_based_product_gets_correct_sku(category, family):
+    product = create_product(
+        name="Toothbrush",
+        product_family=family,
+        category=category,
+        size_value=1,
+        size_unit="PCS",
+        base_unit="piece",
+        retail_price=50,
+        wholesale_price=40,
+    )
+
+    assert product.sku == "MARG-001PCS"
+    assert product.size_unit == "PCS"
+
 
 def test_invalid_product_data_is_rejected(category, family):
     with pytest.raises(ValidationError):

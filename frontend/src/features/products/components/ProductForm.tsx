@@ -216,6 +216,7 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                   <option value="KG">Kilograms (KG)</option>
                   <option value="ML">Millilitres (ML)</option>
                   <option value="L">Litres (L)</option>
+                  <option value="PCS">Pieces (PCS)</option>
                 </select>
               </label>
 

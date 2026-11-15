@@ -21,8 +21,9 @@ import {
   useAddSalePayment,
   useCompleteSale,
 } from './hooks/useSales'
-import { salesService } from './api/sales.service'
 
+import { salesService } from './api/sales.service'
+import { downloadInvoicePdf,downloadReceiptPdf } from './utils/salesPdf'
 import type { Product } from '../products/product.types'
 import type { ProductPackaging } from '../inventory/packaging.types'
 import type {
@@ -561,6 +562,14 @@ export default function SalesPage() {
 
           <button
             type="button"
+            className="sales-back-button"
+            onClick={() => downloadReceiptPdf(completedSale)}
+          >
+            Download receipt PDF
+          </button>
+
+          <button
+            type="button"
             className="sales-checkout-button"
             onClick={startNewSale}
           >
@@ -859,23 +868,42 @@ export default function SalesPage() {
               )}
 
               {checkoutStep === 'cart' && (
-                <button
-                  type="button"
-                  className="sales-checkout-button"
-                  disabled={cart.length === 0 || isPreparing}
-                  onClick={() => void handlePrepareSale()}
-                >
-                  {isPreparing ? (
-                    <>
-                      <LoaderCircle size={17} />
-                      Preparing sale...
-                    </>
-                  ) : draftSale ? (
-                    'Retry preparing sale'
-                  ) : (
-                    'Proceed to payment'
-                  )}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="sales-back-button"
+                    disabled={cart.length === 0}
+                    onClick={() => {
+                      void downloadInvoicePdf(cart).catch((error: unknown) => {
+                        setCheckoutError(
+                          error instanceof Error
+                            ? error.message
+                            : 'Unable to generate invoice PDF.',
+                        )
+                      })
+                    }}
+                  >
+                    Download invoice PDF
+                  </button>
+
+                  <button
+                    type="button"
+                    className="sales-checkout-button"
+                    disabled={cart.length === 0 || isPreparing}
+                    onClick={() => void handlePrepareSale()}
+                  >
+                    {isPreparing ? (
+                      <>
+                        <LoaderCircle size={17} />
+                        Preparing sale...
+                      </>
+                    ) : draftSale ? (
+                      'Retry preparing sale'
+                    ) : (
+                      'Proceed to payment'
+                    )}
+                  </button>
+                </>
               )}
 
               {checkoutStep === 'payment' && draftSale && (

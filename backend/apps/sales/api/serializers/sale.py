@@ -74,6 +74,12 @@ class SaleSerializer(
 ):
     items = SaleItemSerializer(many=True, read_only=True)
     payments = SalePaymentSerializer(many=True, read_only=True)
+    processed_by_name = serializers.SerializerMethodField()
+
+    def get_processed_by_name(self, obj):
+        full_name = obj.processed_by.get_full_name().strip()
+        return full_name or obj.processed_by.username
+
     gross_profit = serializers.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -86,6 +92,7 @@ class SaleSerializer(
             "id",
             "receipt_number",
             "processed_by",
+            "processed_by_name",
             "status",
             "total_amount",
             "total_cost",

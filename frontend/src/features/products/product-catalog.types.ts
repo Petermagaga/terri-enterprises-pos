@@ -27,7 +27,7 @@ export interface CreateProductPayload {
   category: number
   brand: string
   size_value: string
-  size_unit: 'G' | 'KG' | 'ML' | 'L'
+  size_unit: 'G' | 'KG' | 'ML' | 'L'|'PCS'
   base_unit: string
   retail_price: string
   wholesale_price: string

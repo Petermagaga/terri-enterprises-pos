@@ -22,13 +22,20 @@ export default function AppLayout() {
   return (
     <div className="app-layout">
       <aside className="app-sidebar">
-        <div className="sidebar-brand">
-          <div className="sidebar-brand-icon">T</div>
-          <div>
-            <h2>Terri Enterprises</h2>
-            <span>POS System</span>
+
+          <div className="sidebar-brand">
+            <div className="sidebar-logo">
+              <img
+                src="/terri-logo.png"
+                alt="TeRRi Enterprises"
+              />
+            </div>
+
+            <div className="sidebar-brand-info">
+              <span>BUSINESS POS</span>
+              <small>Wholesale & Retail Management</small>
+            </div>
           </div>
-        </div>
 
         <div className="sidebar-user">
           <div className="user-avatar">

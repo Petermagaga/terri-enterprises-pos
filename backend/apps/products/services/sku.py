@@ -127,7 +127,7 @@ def format_size_for_sku(size_value, size_unit):
 
     unit = size_unit.upper()
 
-    if unit not in ("G", "KG", "ML", "L"):
+    if unit not in ("G", "KG", "ML", "L","PCS"):
         raise ValidationError("Unsupported product size unit.")
 
     normalized_size = format(size.normalize(), "f")

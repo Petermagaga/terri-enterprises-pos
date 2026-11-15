@@ -35,6 +35,7 @@ export interface Sale {
   id: number
   receipt_number: string | null
   processed_by: number
+  processed_by_name?: string
   status: SaleStatus
   total_amount: number | string
   total_cost?: number | string
