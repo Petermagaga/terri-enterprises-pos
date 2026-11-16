@@ -12,6 +12,8 @@ class OwnerDashboardSerializer(serializers.Serializer):
 
     stock_summary = serializers.DictField()
 
+    inventory_valuation = serializers.DictField()
+
     top_products = serializers.ListField(
         child=serializers.DictField(),
     )

@@ -7,7 +7,8 @@ from apps.inventory.api.views import (
     PurchaseItemViewSet,
     StockBalanceViewSet,
     StockMovementViewSet,
-    StockAdjustmentView
+    StockAdjustmentView,
+    InventoryValuationView,
 )
 
 
@@ -49,6 +50,11 @@ urlpatterns = [
         "stock-adjustments/",
         StockAdjustmentView.as_view(),
         name="inventory-stock-adjustment",
+    ),
+    path(
+        "valuation/",
+        InventoryValuationView.as_view(),
+        name="inventory-valuation",
     ),
     *router.urls,
 ]

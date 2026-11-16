@@ -20,6 +20,7 @@ import {
   PaymentSummaryPage,
   SalesSummaryPage,
   CashiersPage,
+  InventoryValuationPage,
 } from './routePages'
 
 export const router = createBrowserRouter([
@@ -56,6 +57,7 @@ export const router = createBrowserRouter([
             path: '/product-profitability',
             element: <ProductProfitabilityPage />,
           },
+          { path: '/inventory-valuation', element: <InventoryValuationPage /> },
           {
             path: '/payment-summary',
             element: <PaymentSummaryPage />,

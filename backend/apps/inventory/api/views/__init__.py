@@ -4,6 +4,7 @@ from .purchase_item import PurchaseItemViewSet
 from .stock_balance import StockBalanceViewSet
 from .stock_movement import StockMovementViewSet
 from .stock_adjustment import StockAdjustmentView
+from .inventory_valuation import InventoryValuationView
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "StockBalanceViewSet",
     "StockMovementViewSet",
     "StockAdjustmentView",
+    "InventoryValuationView",
 ]

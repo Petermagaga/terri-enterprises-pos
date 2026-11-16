@@ -14,7 +14,8 @@ import {
   getPurchaseItemsForPurchase,
   addPurchaseItem,
   getProductPackaging,
-  deletePurchaseItem
+  deletePurchaseItem,
+  getInventoryValuation
 } from '../api/inventory.service'
 
 import type {
@@ -30,6 +31,13 @@ export function useStockBalances(page = 1) {
   return useQuery({
     queryKey: ['stock-balances', page],
     queryFn: () => getStockBalances(page),
+  })
+}
+
+export function useInventoryValuation() {
+  return useQuery({
+    queryKey: ['inventory-valuation'],
+    queryFn: getInventoryValuation,
   })
 }
 
@@ -108,6 +116,8 @@ export function useReceivePurchase() {
         queryKey: ['purchase-items', purchase.id],
       })
       queryClient.invalidateQueries({ queryKey: ['stock-balances'] })
+      queryClient.invalidateQueries({ queryKey: ['inventory-valuation'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'owner'] })
     },
   })
 }

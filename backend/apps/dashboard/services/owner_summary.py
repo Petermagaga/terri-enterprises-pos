@@ -12,6 +12,10 @@ from apps.reporting.services.product_profitability import (
     calculate_product_profitability,
 )
 
+from apps.inventory.services.inventory_valuation import (
+    get_inventory_valuation,
+)
+
 def get_owner_dashboard_summary() -> dict:
     """
     Build the Owner dashboard's daily financial and sales summary.
@@ -27,6 +31,7 @@ def get_owner_dashboard_summary() -> dict:
         group_by="daily",
     )
     stock_summary = get_stock_summary()
+    inventory_valuation = get_inventory_valuation()
     top_products = calculate_product_profitability(date_range)[:5]
 
     today_sales = sales_summary[0] if sales_summary else {
@@ -42,5 +47,6 @@ def get_owner_dashboard_summary() -> dict:
         "payment_summary": payment_summary,
         "sales_summary": today_sales,
         "stock_summary": stock_summary,
+        "inventory_valuation": inventory_valuation,
         "top_products": top_products,
     }

@@ -29,6 +29,10 @@ export const InventoryPage = lazy(
   () => import('../features/inventory/InventoryPage'),
 )
 
+export const InventoryValuationPage = lazy(
+  () => import('../features/inventory/InventoryValuationPage'),
+)
+
 export const ExpensesPage = lazy(
   () => import('../features/expenses/ExpensesPage'),
 )

@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   TrendingUp,
   Wallet,
+  Warehouse,
 } from 'lucide-react'
 
 import { useAuth } from '../../auth/useAuth'
@@ -279,7 +280,28 @@ export default function OwnerDashboardPage() {
           />
         </div>
       </section>
-        
+
+      <section className="dashboard-section">
+        <div className="section-heading">
+          <div>
+            <h2>Inventory valuation</h2>
+            <p>Current stock value at landed cost</p>
+          </div>
+        </div>
+
+        <div className="stats-grid">
+          <StatCard
+            title="Inventory value (at cost)"
+            value={formatCurrency(
+              data.inventory_valuation.total_inventory_value,
+            )}
+            description={`${data.inventory_valuation.products_with_stock} products with available stock`}
+            icon={<Warehouse size={20} />}
+          />
+        </div>
+      </section>
+
+
     <section className="dashboard-section">
       <div className="section-heading">
         <div>

@@ -8,6 +8,7 @@ import type {
   ProductPackaging,
   CreatePurchasePayload,
   CreatePurchaseItemPayload,
+  InventoryValuation,
 } from '../inventory.types'
 
 export async function getStockBalances(page = 1) {
@@ -98,6 +99,15 @@ export async function createProductPackaging(
   const response = await apiClient.post<ProductPackaging>(
     '/inventory/packaging/',
     payload,
+  )
+
+  return response.data
+}
+
+
+export async function getInventoryValuation() {
+  const response = await apiClient.get<InventoryValuation>(
+    '/inventory/valuation/',
   )
 
   return response.data

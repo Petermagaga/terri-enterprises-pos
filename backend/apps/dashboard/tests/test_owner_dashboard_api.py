@@ -74,4 +74,5 @@ def test_owner_can_access_owner_dashboard(
     assert "payment_summary" in response.data
     assert "sales_summary" in response.data
     assert "stock_summary" in response.data
+    assert "inventory_valuation" in response.data
     assert "top_products" in response.data

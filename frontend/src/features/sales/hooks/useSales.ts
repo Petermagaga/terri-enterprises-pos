@@ -81,6 +81,8 @@ export function useCompleteSale() {
     onSuccess: (sale) => {
       queryClient.setQueryData(['sales', 'detail', sale.id], sale)
       queryClient.invalidateQueries({ queryKey: ['sales'] })
+      queryClient.invalidateQueries({ queryKey: ['inventory-valuation'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'owner'] })
     },
   })
 }

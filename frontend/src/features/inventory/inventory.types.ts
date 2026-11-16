@@ -72,3 +72,19 @@ export interface CreatePurchaseItemPayload {
   package_quantity: string
   purchase_unit_cost: string
 }
+export interface InventoryValuationProduct {
+  product_id: number
+  product_name: string
+  product_sku: string
+  base_unit: string
+  is_active: boolean
+  quantity_on_hand: number | string
+  unit_cost: number | string
+  stock_value: number | string
+}
+
+export interface InventoryValuation {
+  total_inventory_value: number | string
+  products_with_stock: number
+  products: InventoryValuationProduct[]
+}

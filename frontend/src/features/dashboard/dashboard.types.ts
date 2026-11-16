@@ -33,6 +33,23 @@ export interface StockSummary {
   out_of_stock_products: number
 }
 
+export interface InventoryValuationProduct {
+  product_id: number
+  product_name: string
+  product_sku: string
+  base_unit: string
+  is_active: boolean
+  quantity_on_hand: number | string
+  unit_cost: number | string
+  stock_value: number | string
+}
+
+export interface InventoryValuation {
+  total_inventory_value: number | string
+  products_with_stock: number
+  products: InventoryValuationProduct[]
+}
+
 export interface TopProduct {
   product_id: number
   product_name: string
@@ -50,6 +67,7 @@ export interface OwnerDashboardData {
   payment_summary: PaymentSummary
   sales_summary: SalesSummary
   stock_summary: StockSummary
+  inventory_valuation: InventoryValuation
   top_products: TopProduct[]
 }
 

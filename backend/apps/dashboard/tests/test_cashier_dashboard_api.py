@@ -50,6 +50,7 @@ def test_cashier_can_access_cashier_dashboard(api_client, cashier):
     assert "payment_summary" in response.data
     assert "stock_summary" in response.data
     assert "recent_sales" in response.data
+    assert "inventory_valuation" not in response.data
 
 
 def test_owner_can_access_cashier_dashboard(api_client, owner):

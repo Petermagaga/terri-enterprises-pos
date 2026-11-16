@@ -12,6 +12,7 @@ import {
   History,
   TrendingUp,
   Banknote,
+  Warehouse,
 } from 'lucide-react'
 
 import { useAuth } from '../../auth/useAuth'
@@ -41,6 +42,7 @@ export default function Sidebar() {
       ? [
           { label: 'Products', path: '/products', icon: Package },
           { label: 'Inventory', path: '/inventory', icon: Boxes },
+          { label: 'Inventory Valuation', path: '/inventory-valuation', icon: Warehouse },
           { label: 'Suppliers', path: '/suppliers', icon: Truck },
           { label: 'Expenses', path: '/expenses', icon: Receipt },
           { label: 'Reports', path: '/reports', icon: BarChart3 },

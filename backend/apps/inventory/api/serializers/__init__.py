@@ -5,6 +5,10 @@ from .stock_balance import StockBalanceSerializer
 from .stock_movement import StockMovementSerializer
 from .stock_adjustment import StockAdjustmentSerializer
 from .stock_adjustment_result import StockAdjustmentMovementSerializer
+from .inventory_valuation import (
+    InventoryValuationSerializer,
+    InventoryValuationProductSerializer,
+)
 
 
 __all__ = [
@@ -15,4 +19,6 @@ __all__ = [
     "StockMovementSerializer",
     "StockAdjustmentSerializer",
     "StockAdjustmentMovementSerializer",
+    "InventoryValuationSerializer",
+    "InventoryValuationProductSerializer",
 ]
