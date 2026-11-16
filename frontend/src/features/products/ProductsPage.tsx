@@ -7,13 +7,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings2,
+  Pencil,
 } from 'lucide-react'
 
 import { Link } from 'react-router-dom'
 
+import { useAuth } from '../../auth/useAuth'
 import { useProducts } from './hooks/useProducts'
 
 import ProductForm from './components/ProductForm'
+import type { Product } from './product.types'
 
 function formatCurrency(value: number | string) {
   return new Intl.NumberFormat('en-KE', {
@@ -24,9 +27,14 @@ function formatCurrency(value: number | string) {
 }
 
 export default function ProductsPage() {
+  const { user } = useAuth()
+  const isOwner = user?.role === 'OWNER'
+
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [showProductForm, setShowProductForm] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+
   const { data, isLoading, isError, error } = useProducts(page)
 
   const products = useMemo(() => data?.results ?? [], [data?.results])
@@ -50,6 +58,21 @@ export default function ProductsPage() {
     (product) => product.is_active,
   ).length
 
+  function openAddForm() {
+    setSelectedProduct(null)
+    setShowProductForm(true)
+  }
+
+  function openEditForm(product: Product) {
+    setSelectedProduct(product)
+    setShowProductForm(true)
+  }
+
+  function closeProductForm() {
+    setShowProductForm(false)
+    setSelectedProduct(null)
+  }
+
   return (
     <div className="products-page">
       <div className="page-heading">
@@ -58,23 +81,24 @@ export default function ProductsPage() {
           <h1>Products</h1>
           <p>Manage your supermarket products and selling prices.</p>
         </div>
-        
+
         <div className="products-heading-actions">
-        <Link to="/catalogue-setup" className="catalogue-setup-button">
+          <Link to="/catalogue-setup" className="catalogue-setup-button">
             <Settings2 size={18} />
             Catalogue Setup
-        </Link>
+          </Link>
 
-        <button
-            type="button"
-            className="primary-button"
-            onClick={() => setShowProductForm(true)}
-        >
-            <Plus size={18} />
-            Add Product
-        </button>
+          {isOwner && (
+            <button
+              type="button"
+              className="primary-button"
+              onClick={openAddForm}
+            >
+              <Plus size={18} />
+              Add Product
+            </button>
+          )}
         </div>
-
       </div>
 
       <div className="products-summary">
@@ -159,6 +183,7 @@ export default function ProductsPage() {
                   <th>Retail Price</th>
                   <th>Wholesale Price</th>
                   <th>Status</th>
+                  {isOwner && <th>Actions</th>}
                 </tr>
               </thead>
 
@@ -186,6 +211,20 @@ export default function ProductsPage() {
                         {product.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
+
+                    {isOwner && (
+                      <td>
+                        <button
+                          type="button"
+                          className="product-edit-button"
+                          onClick={() => openEditForm(product)}
+                          aria-label={`Edit ${product.name}`}
+                        >
+                          <Pencil size={14} />
+                          Edit
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -224,10 +263,13 @@ export default function ProductsPage() {
         </div>
       </div>
 
-    {showProductForm && (
-    <ProductForm onClose={() => setShowProductForm(false)} />
-    )}
-
+      {showProductForm && (
+        <ProductForm
+          key={selectedProduct?.id ?? 'new-product'}
+          product={selectedProduct ?? undefined}
+          onClose={closeProductForm}
+        />
+      )}
     </div>
   )
 }

@@ -7,12 +7,15 @@ import {
   useCategories,
   useCreateProduct,
   useProductFamilies,
+  useUpdateProduct,
 } from '../hooks/useProducts'
 
 import type { CreateProductPayload } from '../product-catalog.types'
+import type { Product } from '../product.types'
 
 interface ProductFormProps {
   onClose: () => void
+  product?: Product
 }
 
 const initialForm = {
@@ -29,19 +32,45 @@ const initialForm = {
   reorder_level: '0',
 }
 
-export default function ProductForm({ onClose }: ProductFormProps) {
-  const [form, setForm] = useState(initialForm)
+export default function ProductForm({
+  onClose,
+  product,
+}: ProductFormProps) {
+  const [form, setForm] = useState(() =>
+    product
+      ? {
+          name: product.name,
+          product_family: String(product.product_family),
+          category: String(product.category),
+          brand: product.brand,
+          size_value: String(product.size_value),
+          size_unit: product.size_unit as CreateProductPayload['size_unit'],
+          base_unit: product.base_unit,
+          retail_price: String(product.retail_price),
+          wholesale_price: String(product.wholesale_price),
+          wholesale_min_quantity: String(product.wholesale_min_quantity),
+          reorder_level: String(product.reorder_level),
+        }
+      : initialForm,
+  )
+
   const [errorMessage, setErrorMessage] = useState('')
 
   const { data: categoriesData, isLoading: loadingCategories } = useCategories()
   const { data: familiesData, isLoading: loadingFamilies } = useProductFamilies()
-  const createProduct = useCreateProduct()
 
-  const categories = categoriesData?.results.filter(
-    (category) => category.is_active,
-  ) ?? []
+  const createProduct = useCreateProduct()
+  const updateProduct = useUpdateProduct()
+
+  const categories =
+    categoriesData?.results.filter(
+      (category) => category.is_active || category.id === product?.category,
+    ) ?? []
 
   const families = familiesData?.results ?? []
+
+  const isPending = createProduct.isPending || updateProduct.isPending
+  const isEditing = Boolean(product)
 
   function updateField(field: keyof typeof initialForm, value: string) {
     setForm((current) => ({
@@ -66,11 +95,19 @@ export default function ProductForm({ onClose }: ProductFormProps) {
       wholesale_price: form.wholesale_price,
       wholesale_min_quantity: Number(form.wholesale_min_quantity),
       reorder_level: Number(form.reorder_level),
-      is_active: true,
+      is_active: product?.is_active ?? true,
     }
 
     try {
-      await createProduct.mutateAsync(payload)
+      if (product) {
+        await updateProduct.mutateAsync({
+          id: product.id,
+          payload,
+        })
+      } else {
+        await createProduct.mutateAsync(payload)
+      }
+
       onClose()
     } catch (error) {
       if (isAxiosError(error)) {
@@ -87,7 +124,9 @@ export default function ProductForm({ onClose }: ProductFormProps) {
               .join(' | '),
           )
         } else {
-          setErrorMessage('Unable to create product. Please try again.')
+          setErrorMessage(
+            `Unable to ${isEditing ? 'update' : 'create'} product. Please try again.`,
+          )
         }
       } else {
         setErrorMessage('An unexpected error occurred.')
@@ -108,8 +147,17 @@ export default function ProductForm({ onClose }: ProductFormProps) {
         <div className="product-modal-header">
           <div>
             <span className="page-eyebrow">PRODUCT CATALOGUE</span>
-            <h2 id="product-form-title">Add New Product</h2>
-            <p>Enter the product details below.</p>
+            <h2 id="product-form-title">
+              {isEditing ? 'Edit Product' : 'Add New Product'}
+            </h2>
+            <p>
+              {isEditing
+                ? 'Correct product details or update selling prices.'
+                : 'Enter the product details below.'}
+            </p>
+            {product && (
+              <small>SKU: {product.sku} (system generated)</small>
+            )}
           </div>
 
           <button
@@ -321,7 +369,7 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 type="button"
                 className="product-cancel-button"
                 onClick={onClose}
-                disabled={createProduct.isPending}
+                disabled={isPending}
               >
                 Cancel
               </button>
@@ -330,13 +378,17 @@ export default function ProductForm({ onClose }: ProductFormProps) {
                 type="submit"
                 className="primary-button"
                 disabled={
-                  createProduct.isPending ||
+                  isPending ||
                   loadingOptions ||
                   categories.length === 0 ||
                   families.length === 0
                 }
               >
-                {createProduct.isPending ? 'Saving...' : 'Save Product'}
+                {isPending
+                  ? 'Saving...'
+                  : isEditing
+                    ? 'Update Product'
+                    : 'Save Product'}
               </button>
             </div>
           </form>
