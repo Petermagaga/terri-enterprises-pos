@@ -49,12 +49,54 @@ export const productsService = {
     return response.data
   },
 
+
+  async getAllCategories(): Promise<Category[]> {
+    const categories: Category[] = []
+    let page = 1
+    let hasNextPage = true
+
+    while (hasNextPage) {
+      const response = await apiClient.get<PaginatedResponse<Category>>(
+        '/categories/',
+        { params: { page } },
+      )
+
+      categories.push(...response.data.results)
+      hasNextPage = response.data.next !== null
+      page += 1
+    }
+
+    return categories
+  },  
+
+
   async getProductFamilies(): Promise<PaginatedResponse<ProductFamily>> {
     const response = await apiClient.get<PaginatedResponse<ProductFamily>>(
       '/product-families/',
     )
     return response.data
   },
+
+
+  async getAllProductFamilies(): Promise<ProductFamily[]> {
+    const families: ProductFamily[] = []
+    let page = 1
+    let hasNextPage = true
+
+    while (hasNextPage) {
+      const response = await apiClient.get<PaginatedResponse<ProductFamily>>(
+        '/product-families/',
+        { params: { page } },
+      )
+
+      families.push(...response.data.results)
+      hasNextPage = response.data.next !== null
+      page += 1
+    }
+
+    return families
+  },
+
 
   async createCategory(payload: CreateCategoryPayload): Promise<Category> {
     const response = await apiClient.post<Category>('/categories/', payload)

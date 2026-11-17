@@ -4,9 +4,9 @@ import { isAxiosError } from 'axios'
 import { X } from 'lucide-react'
 
 import {
-  useCategories,
+  useAllProductFamilies,
   useCreateProduct,
-  useProductFamilies,
+  useAllCategories,
   useUpdateProduct,
 } from '../hooks/useProducts'
 
@@ -56,18 +56,18 @@ export default function ProductForm({
 
   const [errorMessage, setErrorMessage] = useState('')
 
-  const { data: categoriesData, isLoading: loadingCategories } = useCategories()
-  const { data: familiesData, isLoading: loadingFamilies } = useProductFamilies()
+  const { data: categoriesData, isLoading: loadingCategories } = useAllCategories()
+  const { data: familiesData, isLoading: loadingFamilies } = useAllProductFamilies()
 
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
 
   const categories =
-    categoriesData?.results.filter(
+    categoriesData?.filter(
       (category) => category.is_active || category.id === product?.category,
     ) ?? []
 
-  const families = familiesData?.results ?? []
+  const families = familiesData ?? []
 
   const isPending = createProduct.isPending || updateProduct.isPending
   const isEditing = Boolean(product)

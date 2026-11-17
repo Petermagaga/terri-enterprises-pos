@@ -42,6 +42,20 @@ export function useCategories() {
   })
 }
 
+export function useAllCategories() {
+  return useQuery({
+    queryKey: ['categories', 'all'],
+    queryFn: () => productsService.getAllCategories(),
+  })
+}
+
+export function useAllProductFamilies() {
+  return useQuery({
+    queryKey: ['product-families', 'all'],
+    queryFn: () => productsService.getAllProductFamilies(),
+  })
+}
+
 export function useProductFamilies() {
   return useQuery({
     queryKey: ['product-families'],
