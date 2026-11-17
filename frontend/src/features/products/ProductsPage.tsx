@@ -13,7 +13,7 @@ import {
 import { Link } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
-import { useProducts } from './hooks/useProducts'
+import { useAllProducts } from './hooks/useProducts'
 
 import ProductForm from './components/ProductForm'
 import type { Product } from './product.types'
@@ -35,16 +35,16 @@ export default function ProductsPage() {
   const [showProductForm, setShowProductForm] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
-  const { data, isLoading, isError, error } = useProducts(page)
+  const { data, isLoading, isError, error } = useAllProducts()
 
-  const products = useMemo(() => data?.results ?? [], [data?.results])
+  const allProducts = useMemo(() => data ?? [], [data])
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase()
 
-    if (!term) return products
+    if (!term) return allProducts
 
-    return products.filter((product) =>
+    return allProducts.filter((product) =>
       [
         product.name,
         product.sku,
@@ -52,9 +52,18 @@ export default function ProductsPage() {
         product.category.toString(),
       ].some((value) => value.toLowerCase().includes(term)),
     )
-  }, [products, search])
+  }, [allProducts, search])
 
-  const activeProducts = products.filter(
+  const pageSize = 20
+  const totalProducts = filteredProducts.length
+  const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize))
+
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filteredProducts.slice(start, start + pageSize)
+  }, [filteredProducts, page])
+
+  const activeProducts = paginatedProducts.filter(
     (product) => product.is_active,
   ).length
 
@@ -108,7 +117,7 @@ export default function ProductsPage() {
           </div>
           <div>
             <span>Products on this page</span>
-            <strong>{products.length}</strong>
+            <strong>{paginatedProducts.length}</strong>
           </div>
         </div>
 
@@ -128,7 +137,7 @@ export default function ProductsPage() {
           </div>
           <div>
             <span>Total products</span>
-            <strong>{data?.count ?? 0}</strong>
+            <strong>{allProducts.length}</strong>
           </div>
         </div>
       </div>
@@ -144,9 +153,13 @@ export default function ProductsPage() {
             <Search size={18} />
             <input
               type="search"
-              placeholder="Search this page..."
+              placeholder="Search all products..."
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setPage(1)
+              }}
+
             />
           </div>
         </div>
@@ -188,7 +201,7 @@ export default function ProductsPage() {
               </thead>
 
               <tbody>
-                {filteredProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                   <tr key={product.id}>
                     <td>
                       <strong>{product.name}</strong>
@@ -232,35 +245,37 @@ export default function ProductsPage() {
           </div>
         )}
 
-        <div className="products-pagination">
-          <span>
-            Showing {products.length === 0 ? 0 : (page - 1) * 20 + 1}
-            {' '}to {Math.min(page * 20, data?.count ?? 0)}
-            {' '}of {data?.count ?? 0} products
-          </span>
 
-          <div>
-            <button
-              type="button"
-              disabled={!data?.previous || isLoading}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              aria-label="Previous page"
-            >
-              <ChevronLeft size={18} />
-            </button>
 
-            <span>Page {page}</span>
+      <div className="products-pagination">
+        <span>
+          Showing {totalProducts === 0 ? 0 : (page - 1) * pageSize + 1}
+          {' '}to {Math.min(page * pageSize, totalProducts)}
+          {' '}of {totalProducts} products
+        </span>
 
-            <button
-              type="button"
-              disabled={!data?.next || isLoading}
-              onClick={() => setPage((current) => current + 1)}
-              aria-label="Next page"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
+        <div>
+          <button
+            type="button"
+            disabled={page <= 1 || isLoading}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+            aria-label="Previous page"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <span>Page {page} of {totalPages}</span>
+
+          <button
+            type="button"
+            disabled={page >= totalPages || isLoading}
+            onClick={() => setPage((current) => current + 1)}
+            aria-label="Next page"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
+      </div>
       </div>
 
       {showProductForm && (
