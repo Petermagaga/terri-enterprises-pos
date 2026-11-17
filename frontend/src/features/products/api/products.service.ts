@@ -20,10 +20,27 @@ export const productsService = {
     return response.data
   },
 
+  async getAllProducts(): Promise<Product[]> {
+    const products: Product[] = []
+    let page = 1
+    let hasNextPage = true
+
+    while (hasNextPage) {
+      const response = await productsService.getProducts(page)
+
+      products.push(...response.results)
+      hasNextPage = response.next !== null
+      page += 1
+    }
+
+    return products
+  },
+
   async getProduct(id: number): Promise<Product> {
     const response = await apiClient.get<Product>(`/products/${id}/`)
     return response.data
   },
+
 
   async getCategories(): Promise<PaginatedResponse<Category>> {
     const response = await apiClient.get<PaginatedResponse<Category>>(

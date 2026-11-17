@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { isAxiosError } from 'axios'
 
-import { useProducts } from '../../products/hooks/useProducts'
+import { useAllProducts } from '../../products/hooks/useProducts'
 import {
   useAddPurchaseItem,
   useProductPackaging,
@@ -25,13 +25,13 @@ export default function PurchaseItemForm({
   const [purchaseUnitCost, setPurchaseUnitCost] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const { data: productsData, isLoading: isLoadingProducts } = useProducts()
+  const { data: productsData, isLoading: isLoadingProducts } = useAllProducts()
   const { data: packagingData, isLoading: isLoadingPackaging } =
     useProductPackaging(Number(product))
 
   const addPurchaseItemMutation = useAddPurchaseItem()
 
-  const products = (productsData?.results ?? []).filter(
+  const products = (productsData ?? []).filter(
     (item) => item.is_active,
   )
 

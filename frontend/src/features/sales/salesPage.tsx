@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { isAxiosError } from 'axios'
 
-import { useProducts } from '../products/hooks/useProducts'
+import { useAllProducts } from '../products/hooks/useProducts'
 import { useProductPackaging } from '../inventory/hooks/usePackaging'
 import {
   useCreateSale,
@@ -93,10 +93,10 @@ function getPaidAmount(sale: Sale) {
 }
 
 export default function SalesPage() {
-  const { data: productsData, isLoading, isError } = useProducts()
+  const { data: productsData, isLoading, isError } = useAllProducts()
   const products = useMemo(
-  () => productsData?.results ?? [],
-  [productsData?.results],
+  () => productsData?? [],
+  [productsData],
 )
 
   const createSale = useCreateSale()

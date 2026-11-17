@@ -20,6 +20,13 @@ export function useProducts(page = 1) {
   })
 }
 
+export function useAllProducts() {
+  return useQuery({
+    queryKey: ['products', 'all'],
+    queryFn: () => productsService.getAllProducts(),
+  })
+}
+
 export function useProduct(id: number) {
   return useQuery({
     queryKey: ['products', id],

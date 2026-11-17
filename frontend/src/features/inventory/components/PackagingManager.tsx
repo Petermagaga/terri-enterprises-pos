@@ -2,11 +2,11 @@
 import { useState } from 'react'
 import { Plus, Package } from 'lucide-react'
 
-import { useProducts } from '../../products/hooks/useProducts'
+import { useAllProducts } from '../../products/hooks/useProducts'
 import { useCreateProductPackaging } from '../hooks/useInventory'
 
 export default function PackagingManager() {
-  const { data, isLoading } = useProducts()
+  const { data, isLoading } = useAllProducts()
   const createPackaging = useCreateProductPackaging()
 
   const [product, setProduct] = useState('')
@@ -15,7 +15,7 @@ export default function PackagingManager() {
   const [purchaseEnabled, setPurchaseEnabled] = useState(true)
   const [salesEnabled, setSalesEnabled] = useState(true)
 
-  const products = data?.results ?? []
+  const products = data ?? []
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
