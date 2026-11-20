@@ -1,3 +1,4 @@
+
 export interface FinancialSummary {
   start_date: string
   end_date: string
@@ -5,7 +6,14 @@ export interface FinancialSummary {
   cost_of_goods_sold: number | string
   gross_profit: number | string
   operating_expenses: number | string
+  setup_expenses: number | string
+  capital_expenses: number | string
   net_profit: number | string
+}
+
+export interface DateRange {
+  start_date: string
+  end_date: string
 }
 
 export interface PaymentMethodSummary {
@@ -21,6 +29,14 @@ export interface PaymentSummary {
 }
 
 export interface SalesSummary {
+  sale_count: number
+  revenue: number | string
+  cost_of_goods_sold: number | string
+  gross_profit: number | string
+}
+
+export interface SalesTrendPoint {
+  period: string
   sale_count: number
   revenue: number | string
   cost_of_goods_sold: number | string
@@ -60,17 +76,27 @@ export interface TopProduct {
   gross_profit: number | string
 }
 
+export interface CategoryPerformance {
+  category_id: number
+  category_name: string
+  quantity_sold: number
+  revenue: number | string
+  cost_of_goods_sold: number | string
+  gross_profit: number | string
+}
 
 export interface OwnerDashboardData {
   date: string
+  date_range: DateRange
   financial_summary: FinancialSummary
   payment_summary: PaymentSummary
   sales_summary: SalesSummary
+  sales_trend: SalesTrendPoint[]
   stock_summary: StockSummary
   inventory_valuation: InventoryValuation
   top_products: TopProduct[]
+  category_performance: CategoryPerformance[]
 }
-
 
 export interface CashierSalesSummary {
   sale_count: number

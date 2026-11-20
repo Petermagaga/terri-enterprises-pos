@@ -9,17 +9,18 @@ from apps.expenses.models import Expense
 from apps.reporting.services.date_ranges import DateRange
 from apps.sales.models import Sale
 
+from django.db import models
 
 ZERO = Decimal("0.00")
 
 
 def calculate_profit_loss(date_range: DateRange) -> dict:
     """
-    Calculate revenue, COGS, gross profit, expenses, and net profit
+    Calculate revenue, COGS, gross profit, and expense classifications
     for an inclusive reporting date range.
 
-    Sale timestamps are filtered using Nairobi-aware datetime boundaries.
-    Expenses are filtered using their local calendar dates.
+    Only operating expenses reduce ordinary operating net profit.
+    Setup and capital expenses are reported separately.
     """
 
     start_datetime = timezone.make_aware(
@@ -42,18 +43,37 @@ def calculate_profit_loss(date_range: DateRange) -> dict:
         cost_of_goods_sold=Sum("total_cost", default=ZERO),
     )
 
-    expense_totals = Expense.objects.filter(
+    expenses = Expense.objects.filter(
         expense_date__range=(
             date_range.start_date,
             date_range.end_date,
         )
-    ).aggregate(
-        operating_expenses=Sum("amount", default=ZERO),
+    )
+
+    expense_totals = expenses.aggregate(
+        operating_expenses=Sum(
+            "amount",
+            filter=models.Q(expense_type=Expense.ExpenseType.OPERATING),
+            default=ZERO,
+        ),
+        setup_expenses=Sum(
+            "amount",
+            filter=models.Q(expense_type=Expense.ExpenseType.SETUP),
+            default=ZERO,
+        ),
+        capital_expenses=Sum(
+            "amount",
+            filter=models.Q(expense_type=Expense.ExpenseType.CAPITAL),
+            default=ZERO,
+        ),
     )
 
     revenue = sales_totals["revenue"]
     cogs = sales_totals["cost_of_goods_sold"]
+
     operating_expenses = expense_totals["operating_expenses"]
+    setup_expenses = expense_totals["setup_expenses"]
+    capital_expenses = expense_totals["capital_expenses"]
 
     gross_profit = revenue - cogs
     net_profit = gross_profit - operating_expenses
@@ -65,5 +85,7 @@ def calculate_profit_loss(date_range: DateRange) -> dict:
         "cost_of_goods_sold": cogs,
         "gross_profit": gross_profit,
         "operating_expenses": operating_expenses,
+        "setup_expenses": setup_expenses,
+        "capital_expenses": capital_expenses,
         "net_profit": net_profit,
     }

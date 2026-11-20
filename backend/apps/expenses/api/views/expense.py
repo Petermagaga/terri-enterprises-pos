@@ -1,3 +1,4 @@
+
 from django.core.exceptions import (
     PermissionDenied,
     ValidationError as DjangoValidationError,
@@ -44,12 +45,23 @@ class ExpenseViewSet(
 
         try:
             expense = create_expense(
-                description=data["description"],
+                expense_type=data.get(
+                    "expense_type",
+                    Expense.ExpenseType.OPERATING,
+                ),
                 category=data["category"],
+                custom_category=data.get("custom_category", ""),
+                cost_behaviour=data.get(
+                    "cost_behaviour",
+                    Expense.CostBehaviour.VARIABLE,
+                ),
+                description=data["description"],
+                payee=data.get("payee", ""),
                 amount=data["amount"],
                 expense_date=data.get("expense_date"),
                 payment_method=data["payment_method"],
                 payment_reference=data.get("payment_reference", ""),
+                is_recurring=data.get("is_recurring", False),
                 recorded_by=request.user,
             )
 
@@ -59,8 +71,6 @@ class ExpenseViewSet(
                 if hasattr(exc, "message_dict")
                 else exc.messages
             ) from exc
-
-
 
         except PermissionDenied as exc:
             raise DRFPermissionDenied(str(exc)) from exc
@@ -87,10 +97,23 @@ class ExpenseViewSet(
             expense = update_expense(
                 expense=expense,
                 updated_by=request.user,
-                description=data.get("description", expense.description),
+                expense_type=data.get("expense_type", expense.expense_type),
                 category=data.get("category", expense.category),
+                custom_category=data.get(
+                    "custom_category",
+                    expense.custom_category,
+                ),
+                cost_behaviour=data.get(
+                    "cost_behaviour",
+                    expense.cost_behaviour,
+                ),
+                description=data.get("description", expense.description),
+                payee=data.get("payee", expense.payee),
                 amount=data.get("amount", expense.amount),
-                expense_date=data.get("expense_date", expense.expense_date),
+                expense_date=data.get(
+                    "expense_date",
+                    expense.expense_date,
+                ),
                 payment_method=data.get(
                     "payment_method",
                     expense.payment_method,
@@ -98,6 +121,10 @@ class ExpenseViewSet(
                 payment_reference=data.get(
                     "payment_reference",
                     expense.payment_reference,
+                ),
+                is_recurring=data.get(
+                    "is_recurring",
+                    expense.is_recurring,
                 ),
             )
 
@@ -107,7 +134,6 @@ class ExpenseViewSet(
                 if hasattr(exc, "message_dict")
                 else exc.messages
             ) from exc
-
 
         except PermissionDenied as exc:
             raise DRFPermissionDenied(str(exc)) from exc

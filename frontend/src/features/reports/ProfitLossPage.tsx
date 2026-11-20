@@ -275,6 +275,37 @@ export default function ProfitLossPage() {
             </div>
           </section>
 
+              <article className="stat-card">
+                <div className="stat-card-top">
+                  <span className="stat-card-title">Setup costs</span>
+                  <span className="stat-card-icon">
+                    <Wallet size={20} />
+                  </span>
+                </div>
+                <strong className="stat-card-value">
+                  {formatCurrency(report.setup_expenses)}
+                </strong>
+                <span className="stat-card-description">
+                  Initial business establishment costs
+                </span>
+              </article>
+
+              <article className="stat-card">
+                <div className="stat-card-top">
+                  <span className="stat-card-title">Capital expenses</span>
+                  <span className="stat-card-icon">
+                    <Banknote size={20} />
+                  </span>
+                </div>
+                <strong className="stat-card-value">
+                  {formatCurrency(report.capital_expenses)}
+                </strong>
+                <span className="stat-card-description">
+                  Business assets and capital investments
+                </span>
+              </article>
+
+
           <section className="dashboard-section">
             <div className="section-heading">
               <div>
@@ -294,6 +325,21 @@ export default function ProfitLossPage() {
                   - {formatCurrency(report.cost_of_goods_sold)}
                 </strong>
               </div>
+
+
+              <div>
+                <span>Setup costs (excluded from net profit)</span>
+                <strong>
+                  {formatCurrency(report.setup_expenses)}
+                </strong>
+              </div>
+              <div>
+                <span>Capital expenses (excluded from net profit)</span>
+                <strong>
+                  {formatCurrency(report.capital_expenses)}
+                </strong>
+              </div>
+
               <div className="profit-breakdown-total">
                 <span>Gross profit</span>
                 <strong>{formatCurrency(report.gross_profit)}</strong>

@@ -13,6 +13,8 @@ import type {
   Expense,
   ExpenseCategory,
   ExpensePaymentMethod,
+  ExpenseType,
+  CostBehaviour,
 } from '../expense.types'
 
 interface ExpenseFormProps {
@@ -20,26 +22,106 @@ interface ExpenseFormProps {
   expense?: Expense
 }
 
-const initialForm = {
+type ExpenseFormState = CreateExpensePayload
+
+const categoryOptions: Record<
+  ExpenseType,
+  { value: ExpenseCategory; label: string }[]
+> = {
+  SETUP: [
+    { value: 'BUSINESS_REGISTRATION', label: 'Business Registration' },
+    { value: 'LICENSES_PERMITS', label: 'Licenses & Permits' },
+    { value: 'INITIAL_RENT_DEPOSIT', label: 'Initial Rent Deposit' },
+    { value: 'SHOP_RENOVATION', label: 'Shop Renovation & Fittings' },
+    { value: 'SHELVES_DISPLAY_SETUP', label: 'Shelves & Display Setup' },
+    { value: 'REFRIGERATION_SETUP', label: 'Refrigerators & Freezers Setup' },
+    { value: 'INITIAL_STOCK_ARRANGEMENT', label: 'Initial Stock Arrangement' },
+    { value: 'INITIAL_MARKETING', label: 'Initial Marketing & Branding' },
+    { value: 'STAFF_TRAINING', label: 'Staff Recruitment & Training' },
+    { value: 'UTILITY_CONNECTIONS', label: 'Utility Connections' },
+    { value: 'OTHER', label: 'Other - Specify' },
+  ],
+  OPERATING: [
+    { value: 'RENT', label: 'Rent' },
+    { value: 'ELECTRICITY', label: 'Electricity' },
+    { value: 'WATER', label: 'Water' },
+    { value: 'INTERNET', label: 'Internet' },
+    { value: 'SALARIES_WAGES', label: 'Salaries & Wages' },
+    { value: 'FUEL_TRANSPORT', label: 'Fuel & Transport' },
+    { value: 'LOADING_OFFLOADING', label: 'Loading & Offloading' },
+    { value: 'MAINTENANCE_REPAIRS', label: 'Repairs & Maintenance' },
+    { value: 'CLEANING', label: 'Cleaning & Sanitation' },
+    { value: 'SECURITY', label: 'Security' },
+    { value: 'MARKETING_ADVERTISING', label: 'Marketing & Advertising' },
+    { value: 'INSURANCE', label: 'Insurance' },
+    { value: 'PACKAGING_MATERIALS', label: 'Packaging Materials' },
+    { value: 'SHOP_SUPPLIES', label: 'Shop Supplies' },
+    { value: 'TELEPHONE_AIRTIME', label: 'Telephone & Airtime' },
+    { value: 'BANK_CHARGES', label: 'Bank & Transaction Charges' },
+    { value: 'WASTE_COLLECTION', label: 'Waste Collection' },
+    { value: 'MISCELLANEOUS', label: 'Miscellaneous Expenses' },
+    { value: 'OTHER', label: 'Other - Specify' },
+  ],
+  CAPITAL: [
+    { value: 'LAND', label: 'Land' },
+    { value: 'BUILDING', label: 'Building' },
+    { value: 'MOTOR_VEHICLE', label: 'Motor Vehicle' },
+    { value: 'REFRIGERATORS_FREEZERS', label: 'Refrigerators & Freezers' },
+    { value: 'SHELVING_DISPLAY_EQUIPMENT', label: 'Shelving & Display Equipment' },
+    { value: 'CHECKOUT_COUNTERS', label: 'Checkout Counters' },
+    { value: 'POS_EQUIPMENT', label: 'POS Machines & Equipment' },
+    { value: 'COMPUTERS_LAPTOPS', label: 'Computers & Laptops' },
+    { value: 'PRINTERS', label: 'Printers' },
+    { value: 'CCTV_SECURITY', label: 'CCTV & Security Equipment' },
+    { value: 'GENERATORS_BACKUP', label: 'Generators & Power Backup' },
+    { value: 'WEIGHING_SCALES', label: 'Weighing Scales' },
+    { value: 'MACHINERY_EQUIPMENT', label: 'Machinery & Equipment' },
+    { value: 'SOFTWARE_LICENSES', label: 'Software & Licenses' },
+    { value: 'OTHER', label: 'Other - Specify' },
+  ],
+}
+
+const expenseTypeLabels: Record<ExpenseType, string> = {
+  SETUP: 'Setup Cost',
+  OPERATING: 'Operating Cost',
+  CAPITAL: 'Capital Expense',
+}
+
+const initialForm: ExpenseFormState = {
+  expense_type: 'OPERATING',
+  category: 'MISCELLANEOUS',
+  custom_category: '',
+  cost_behaviour: 'VARIABLE',
   description: '',
-  category: 'OTHER' as ExpenseCategory,
+  payee: '',
   amount: '',
   expense_date: new Date().toLocaleDateString('en-CA'),
-  payment_method: 'CASH' as ExpensePaymentMethod,
+  payment_method: 'CASH',
   payment_reference: '',
+  is_recurring: false,
 }
 
 export default function ExpenseForm({
   onClose,
   expense,
 }: ExpenseFormProps) {
-  const [form, setForm] = useState({
-    description: expense?.description ?? initialForm.description,
-    category: expense?.category ?? initialForm.category,
-    amount: expense?.amount ?? initialForm.amount,
-    expense_date: expense?.expense_date ?? initialForm.expense_date,
-    payment_method: expense?.payment_method ?? initialForm.payment_method,
-    payment_reference: expense?.payment_reference ?? '',
+  const [form, setForm] = useState<ExpenseFormState>({
+    ...initialForm,
+    ...(expense
+      ? {
+          expense_type: expense.expense_type,
+          category: expense.category,
+          custom_category: expense.custom_category ?? '',
+          cost_behaviour: expense.cost_behaviour,
+          description: expense.description,
+          payee: expense.payee ?? '',
+          amount: expense.amount,
+          expense_date: expense.expense_date,
+          payment_method: expense.payment_method,
+          payment_reference: expense.payment_reference ?? '',
+          is_recurring: expense.is_recurring,
+        }
+      : {}),
   })
 
   const [errorMessage, setErrorMessage] = useState('')
@@ -50,10 +132,40 @@ export default function ExpenseForm({
   const isEditing = Boolean(expense)
   const isPending = createExpense.isPending || updateExpense.isPending
 
-  function updateField(field: keyof typeof initialForm, value: string) {
+  const requiresReference =
+    form.payment_method === 'MPESA' ||
+    form.payment_method === 'BANK_TRANSFER'
+
+  const showReference =
+    form.payment_method !== 'CASH'
+
+  function updateField<K extends keyof ExpenseFormState>(
+    field: K,
+    value: ExpenseFormState[K],
+  ) {
     setForm((current) => ({
       ...current,
       [field]: value,
+    }))
+  }
+
+  function handleExpenseTypeChange(value: ExpenseType) {
+    const firstCategory = categoryOptions[value][0].value
+
+    setForm((current) => ({
+      ...current,
+      expense_type: value,
+      category: firstCategory,
+      custom_category: '',
+    }))
+  }
+
+  function handlePaymentMethodChange(value: ExpensePaymentMethod) {
+    setForm((current) => ({
+      ...current,
+      payment_method: value,
+      payment_reference:
+        value === 'CASH' ? '' : current.payment_reference,
     }))
   }
 
@@ -62,11 +174,13 @@ export default function ExpenseForm({
     setErrorMessage('')
 
     const payload: CreateExpensePayload = {
+      ...form,
       description: form.description.trim(),
-      category: form.category,
-      amount: form.amount,
-      expense_date: form.expense_date,
-      payment_method: form.payment_method,
+      custom_category:
+        form.category === 'OTHER'
+          ? form.custom_category.trim()
+          : '',
+      payee: form.payee.trim(),
       payment_reference:
         form.payment_method === 'CASH'
           ? ''
@@ -111,8 +225,6 @@ export default function ExpenseForm({
     }
   }
 
-  const requiresReference = form.payment_method !== 'CASH'
-
   return (
     <div className="product-modal-backdrop">
       <div
@@ -130,7 +242,7 @@ export default function ExpenseForm({
             <p>
               {isEditing
                 ? 'Update the expense details below.'
-                : 'Enter the expense details below.'}
+                : 'Record and classify a business expense.'}
             </p>
           </div>
 
@@ -147,24 +259,102 @@ export default function ExpenseForm({
         <form onSubmit={handleSubmit}>
           <div className="product-form-grid">
             <label>
+              Expense Type *
+              <select
+                required
+                value={form.expense_type}
+                onChange={(event) =>
+                  handleExpenseTypeChange(event.target.value as ExpenseType)
+                }
+              >
+                {Object.entries(expenseTypeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
               Expense Category *
               <select
                 required
                 value={form.category}
+                onChange={(event) => {
+                  const category = event.target.value as ExpenseCategory
+
+                  setForm((current) => ({
+                    ...current,
+                    category,
+                    custom_category:
+                      category === 'OTHER' ? current.custom_category : '',
+                  }))
+                }}
+              >
+                {categoryOptions[form.expense_type].map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {form.category === 'OTHER' && (
+              <label>
+                Specify Category *
+                <input
+                  required
+                  maxLength={150}
+                  value={form.custom_category}
+                  onChange={(event) =>
+                    updateField('custom_category', event.target.value)
+                  }
+                  placeholder="Enter the expense category"
+                />
+              </label>
+            )}
+
+            <label>
+              Cost Behaviour *
+              <select
+                required
+                value={form.cost_behaviour}
                 onChange={(event) =>
-                  updateField('category', event.target.value)
+                  updateField(
+                    'cost_behaviour',
+                    event.target.value as CostBehaviour,
+                  )
                 }
               >
-                <option value="RENT">Rent</option>
-                <option value="ELECTRICITY">Electricity</option>
-                <option value="WATER">Water</option>
-                <option value="SALARIES">Salaries and wages</option>
-                <option value="TRANSPORT">Transport</option>
-                <option value="REPAIRS">Repairs and maintenance</option>
-                <option value="LICENSES">Licenses and permits</option>
-                <option value="INTERNET">Internet and communication</option>
-                <option value="OTHER">Other</option>
+                <option value="FIXED">Fixed</option>
+                <option value="VARIABLE">Variable</option>
+                <option value="SEMI_VARIABLE">Semi-Variable</option>
               </select>
+            </label>
+
+            <label>
+              Description *
+              <input
+                required
+                maxLength={255}
+                value={form.description}
+                onChange={(event) =>
+                  updateField('description', event.target.value)
+                }
+                placeholder="What was this expense for?"
+              />
+            </label>
+
+            <label>
+              Payee / Supplier
+              <input
+                maxLength={255}
+                value={form.payee}
+                onChange={(event) =>
+                  updateField('payee', event.target.value)
+                }
+                placeholder="Name of recipient or supplier"
+              />
             </label>
 
             <label>
@@ -199,57 +389,57 @@ export default function ExpenseForm({
               <select
                 required
                 value={form.payment_method}
-                onChange={(event) => {
-                  const method = event.target.value as ExpensePaymentMethod
-
-                  setForm((current) => ({
-                    ...current,
-                    payment_method: method,
-                    payment_reference:
-                      method === 'CASH' ? '' : current.payment_reference,
-                  }))
-                }}
+                onChange={(event) =>
+                  handlePaymentMethodChange(
+                    event.target.value as ExpensePaymentMethod,
+                  )
+                }
               >
                 <option value="CASH">Cash</option>
                 <option value="MPESA">M-Pesa</option>
-                <option value="BANK">Bank</option>
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="CHEQUE">Cheque</option>
+                <option value="CREDIT_CARD">Credit Card</option>
               </select>
             </label>
 
-            {requiresReference && (
+            {showReference && (
               <label>
-                {form.payment_method === 'MPESA'
-                  ? 'M-Pesa Transaction Reference *'
-                  : 'Bank Transaction Reference *'}
+                Payment Reference {requiresReference ? '*' : '(Optional)'}
                 <input
-                  required
+                  required={requiresReference}
                   maxLength={100}
                   value={form.payment_reference}
                   onChange={(event) =>
                     updateField('payment_reference', event.target.value)
                   }
-                  placeholder="Enter transaction reference"
+                  placeholder={
+                    form.payment_method === 'MPESA'
+                      ? 'Enter M-Pesa transaction code'
+                      : form.payment_method === 'BANK_TRANSFER'
+                        ? 'Enter bank transaction reference'
+                        : form.payment_method === 'CHEQUE'
+                          ? 'Enter cheque number if available'
+                          : 'Enter card transaction reference if available'
+                  }
                 />
               </label>
             )}
 
-            <label>
-              {form.category === 'OTHER'
-                ? 'Specify Expense *'
-                : 'Description *'}
-              <input
-                required
-                maxLength={255}
-                value={form.description}
-                onChange={(event) =>
-                  updateField('description', event.target.value)
-                }
-                placeholder={
-                  form.category === 'OTHER'
-                    ? 'Describe what the expense was for'
-                    : 'Briefly describe this expense'
-                }
-              />
+            <label className="expense-recurring-field">
+              <span>Recurring Expense</span>
+              <span className="expense-recurring-control">
+                <input
+                  type="checkbox"
+                  checked={form.is_recurring}
+                  onChange={(event) =>
+                    updateField('is_recurring', event.target.checked)
+                  }
+                />
+                <span>
+                  {form.is_recurring ? 'Yes, recurring' : 'No, one-time expense'}
+                </span>
+              </span>
             </label>
           </div>
 

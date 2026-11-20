@@ -1,3 +1,4 @@
+
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 
@@ -10,14 +11,18 @@ def update_expense(
     *,
     expense,
     updated_by,
-    description,
-    category,
-    amount,
-    expense_date,
-    payment_method,
-    payment_reference="",
+    description=None,
+    category=None,
+    amount=None,
+    expense_date=None,
+    payment_method=None,
+    payment_reference=None,
+    expense_type=None,
+    custom_category=None,
+    cost_behaviour=None,
+    payee=None,
+    is_recurring=None,
 ):
-
     if (
         updated_by is None
         or not updated_by.is_authenticated
@@ -30,14 +35,26 @@ def update_expense(
     if updated_by.role != User.Role.OWNER:
         raise PermissionDenied("Only the Owner can update expenses.")
 
-    expense.description = description
-    expense.category = category
-    expense.amount = amount
-    expense.expense_date = expense_date
-    expense.payment_method = payment_method
-    expense.payment_reference = payment_reference
+    update_fields = {
+        "description": description,
+        "category": category,
+        "amount": amount,
+        "expense_date": expense_date,
+        "payment_method": payment_method,
+        "payment_reference": payment_reference,
+        "expense_type": expense_type,
+        "custom_category": custom_category,
+        "cost_behaviour": cost_behaviour,
+        "payee": payee,
+        "is_recurring": is_recurring,
+    }
+
+    for field, value in update_fields.items():
+        if value is not None:
+            setattr(expense, field, value)
 
     # recorded_by is intentionally preserved.
+    expense.full_clean()
     expense.save()
 
     return expense

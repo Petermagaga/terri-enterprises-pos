@@ -21,15 +21,72 @@ const currency = (amount: string | number) =>
   })}`
 
 const categoryLabels: Record<string, string> = {
+  BUSINESS_REGISTRATION: 'Business Registration',
+  LICENSES_PERMITS: 'Licenses & Permits',
+  INITIAL_RENT_DEPOSIT: 'Initial Rent Deposit',
+  SHOP_RENOVATION: 'Shop Renovation & Fittings',
+  SHELVES_DISPLAY_SETUP: 'Shelves & Display Setup',
+  REFRIGERATION_SETUP: 'Refrigerators & Freezers Setup',
+  INITIAL_STOCK_ARRANGEMENT: 'Initial Stock Arrangement',
+  INITIAL_MARKETING: 'Initial Marketing & Branding',
+  STAFF_TRAINING: 'Staff Recruitment & Training',
+  UTILITY_CONNECTIONS: 'Utility Connections',
+
   RENT: 'Rent',
   ELECTRICITY: 'Electricity',
   WATER: 'Water',
-  SALARIES: 'Salaries',
-  TRANSPORT: 'Transport',
-  REPAIRS: 'Repairs',
-  LICENSES: 'Licenses',
   INTERNET: 'Internet',
+  SALARIES_WAGES: 'Salaries & Wages',
+  FUEL_TRANSPORT: 'Fuel & Transport',
+  LOADING_OFFLOADING: 'Loading & Offloading',
+  MAINTENANCE_REPAIRS: 'Repairs & Maintenance',
+  CLEANING: 'Cleaning & Sanitation',
+  SECURITY: 'Security',
+  MARKETING_ADVERTISING: 'Marketing & Advertising',
+  INSURANCE: 'Insurance',
+  PACKAGING_MATERIALS: 'Packaging Materials',
+  SHOP_SUPPLIES: 'Shop Supplies',
+  TELEPHONE_AIRTIME: 'Telephone & Airtime',
+  BANK_CHARGES: 'Bank & Transaction Charges',
+  WASTE_COLLECTION: 'Waste Collection',
+  MISCELLANEOUS: 'Miscellaneous Expenses',
+
+  LAND: 'Land',
+  BUILDING: 'Building',
+  MOTOR_VEHICLE: 'Motor Vehicle',
+  REFRIGERATORS_FREEZERS: 'Refrigerators & Freezers',
+  SHELVING_DISPLAY_EQUIPMENT: 'Shelving & Display Equipment',
+  CHECKOUT_COUNTERS: 'Checkout Counters',
+  POS_EQUIPMENT: 'POS Machines & Equipment',
+  COMPUTERS_LAPTOPS: 'Computers & Laptops',
+  PRINTERS: 'Printers',
+  CCTV_SECURITY: 'CCTV & Security Equipment',
+  GENERATORS_BACKUP: 'Generators & Power Backup',
+  WEIGHING_SCALES: 'Weighing Scales',
+  MACHINERY_EQUIPMENT: 'Machinery & Equipment',
+  SOFTWARE_LICENSES: 'Software & Licenses',
+
   OTHER: 'Other',
+}
+
+const expenseTypeLabels: Record<string, string> = {
+  SETUP: 'Setup Cost',
+  OPERATING: 'Operating Cost',
+  CAPITAL: 'Capital Expense',
+}
+
+const paymentMethodLabels: Record<string, string> = {
+  CASH: 'Cash',
+  MPESA: 'M-Pesa',
+  BANK_TRANSFER: 'Bank Transfer',
+  CHEQUE: 'Cheque',
+  CREDIT_CARD: 'Credit Card',
+}
+
+const costBehaviourLabels: Record<string, string> = {
+  FIXED: 'Fixed',
+  VARIABLE: 'Variable',
+  SEMI_VARIABLE: 'Semi-Variable',
 }
 
 export default function ExpensesPage() {
@@ -42,8 +99,8 @@ export default function ExpensesPage() {
   const { data, isLoading, isError, error } = useExpenses(page)
   const deleteExpense = useDeleteExpense()
 
-
   const expenses = useMemo(() => data?.results ?? [], [data?.results])
+
   const filteredExpenses = useMemo(() => {
     const term = search.trim().toLowerCase()
 
@@ -52,7 +109,11 @@ export default function ExpensesPage() {
     return expenses.filter((expense) =>
       [
         expense.description,
+        expense.expense_type,
         expense.category,
+        expense.custom_category,
+        expense.cost_behaviour,
+        expense.payee,
         expense.payment_method,
         expense.payment_reference,
         expense.recorded_by_username,
@@ -91,7 +152,9 @@ export default function ExpensesPage() {
         <div>
           <span className="page-eyebrow">BUSINESS MANAGEMENT</span>
           <h1>Expenses</h1>
-          <p>Record and monitor your supermarket operating expenses.</p>
+          <p>
+            Record and monitor setup, operating and capital expenses.
+          </p>
         </div>
 
         <button
@@ -123,7 +186,7 @@ export default function ExpensesPage() {
             <Receipt size={21} />
           </div>
           <div>
-            <span>Page total</span>
+            <span>Page recorded total</span>
             <strong>{currency(pageTotal)}</strong>
           </div>
         </div>
@@ -143,7 +206,9 @@ export default function ExpensesPage() {
         <div className="products-table-toolbar">
           <div>
             <h2>Expense Records</h2>
-            <p>Review recorded expenses and their payment details.</p>
+            <p>
+              Review expense classifications, suppliers and payment details.
+            </p>
           </div>
 
           <div className="products-search">
@@ -184,7 +249,7 @@ export default function ExpensesPage() {
             </h3>
             <p>
               {search
-                ? 'Try another description, category or payment reference.'
+                ? 'Try another description, category, payee or payment reference.'
                 : 'Record your first expense to start tracking business costs.'}
             </p>
           </div>
@@ -194,11 +259,14 @@ export default function ExpensesPage() {
               <thead>
                 <tr>
                   <th>Date</th>
+                  <th>Expense Type</th>
                   <th>Category</th>
-                  <th>Description</th>
+                  <th>Description / Payee</th>
+                  <th>Cost Behaviour</th>
                   <th>Amount</th>
                   <th>Payment</th>
                   <th>Reference</th>
+                  <th>Recurring</th>
                   <th>Recorded By</th>
                   <th>Actions</th>
                 </tr>
@@ -208,18 +276,49 @@ export default function ExpensesPage() {
                 {filteredExpenses.map((expense) => (
                   <tr key={expense.id}>
                     <td>{expense.expense_date}</td>
+
                     <td>
-                      {categoryLabels[expense.category] ?? expense.category}
+                      {expenseTypeLabels[expense.expense_type] ??
+                        expense.expense_type}
                     </td>
+
+                    <td>
+                      {expense.category === 'OTHER' &&
+                      expense.custom_category
+                        ? expense.custom_category
+                        : categoryLabels[expense.category] ??
+                          expense.category}
+                    </td>
+
                     <td>
                       <strong>{expense.description}</strong>
+                      {expense.payee && (
+                        <div className="expense-table-secondary">
+                          {expense.payee}
+                        </div>
+                      )}
                     </td>
+
+                    <td>
+                      {costBehaviourLabels[expense.cost_behaviour] ??
+                        expense.cost_behaviour}
+                    </td>
+
                     <td>
                       <strong>{currency(expense.amount)}</strong>
                     </td>
-                    <td>{expense.payment_method}</td>
+
+                    <td>
+                      {paymentMethodLabels[expense.payment_method] ??
+                        expense.payment_method}
+                    </td>
+
                     <td>{expense.payment_reference || '—'}</td>
+
+                    <td>{expense.is_recurring ? 'Yes' : 'No'}</td>
+
                     <td>{expense.recorded_by_username}</td>
+
                     <td>
                       <div className="product-row-actions">
                         <button

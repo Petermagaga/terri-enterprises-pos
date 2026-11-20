@@ -17,6 +17,8 @@ export interface ProfitLossData {
   cost_of_goods_sold: string
   gross_profit: string
   operating_expenses: string
+  setup_expenses: string
+  capital_expenses: string
   net_profit: string
 }
 

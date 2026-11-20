@@ -49,16 +49,23 @@ def create_sale(
     )
 
 
-def create_expense(cashier, *, amount, expense_date):
+def create_expense(
+    cashier,
+    *,
+    amount,
+    expense_date,
+    expense_type=Expense.ExpenseType.OPERATING,
+    category=Expense.Category.MISCELLANEOUS,
+):
     return Expense.objects.create(
+        expense_type=expense_type,
         description="Reporting test expense",
-        category=Expense.Category.OTHER,
+        category=category,
         amount=Decimal(amount),
         expense_date=expense_date,
         payment_method=Expense.PaymentMethod.CASH,
         recorded_by=cashier,
     )
-
 
 def test_calculates_profit_and_loss_for_date_range(
     cashier,
@@ -210,3 +217,59 @@ def test_returns_zero_totals_when_no_records_exist(
     assert result["gross_profit"] == Decimal("0.00")
     assert result["operating_expenses"] == Decimal("0.00")
     assert result["net_profit"] == Decimal("0.00")
+
+def test_setup_and_capital_expenses_do_not_reduce_net_profit(
+    cashier,
+    reporting_period,
+):
+    create_sale(
+        cashier,
+        status=Sale.Status.COMPLETED,
+        total_amount="10000.00",
+        total_cost="6000.00",
+        completed_at=timezone.make_aware(
+            datetime.combine(date(2026, 11, 3), time(12, 0))
+        ),
+    )
+
+    create_expense(
+        cashier,
+        amount="500.00",
+        expense_date=date(2026, 11, 2),
+        expense_type=Expense.ExpenseType.OPERATING,
+        category=Expense.Category.ELECTRICITY,
+    )
+
+    create_expense(
+        cashier,
+        amount="2000.00",
+        expense_date=date(2026, 11, 3),
+        expense_type=Expense.ExpenseType.SETUP,
+        category=Expense.Category.BUSINESS_REGISTRATION,
+    )
+
+    create_expense(
+        cashier,
+        amount="5000.00",
+        expense_date=date(2026, 11, 4),
+        expense_type=Expense.ExpenseType.CAPITAL,
+        category=Expense.Category.POS_EQUIPMENT,
+    )
+
+    result = calculate_profit_loss(reporting_period)
+
+    assert result["gross_profit"] == Decimal("4000.00")
+    assert result["operating_expenses"] == Decimal("500.00")
+    assert result["setup_expenses"] == Decimal("2000.00")
+    assert result["capital_expenses"] == Decimal("5000.00")
+    assert result["net_profit"] == Decimal("3500.00")
+
+
+def test_returns_zero_for_each_expense_classification_when_empty(
+    reporting_period,
+):
+    result = calculate_profit_loss(reporting_period)
+
+    assert result["operating_expenses"] == Decimal("0.00")
+    assert result["setup_expenses"] == Decimal("0.00")
+    assert result["capital_expenses"] == Decimal("0.00")
