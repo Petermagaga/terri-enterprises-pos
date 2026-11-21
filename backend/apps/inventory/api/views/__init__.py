@@ -5,7 +5,10 @@ from .stock_balance import StockBalanceViewSet
 from .stock_movement import StockMovementViewSet
 from .stock_adjustment import StockAdjustmentView
 from .inventory_valuation import InventoryValuationView
-
+from .stock_alert import (
+    StockAlertListView,
+    StockAlertMarkAllReadView,
+)
 
 __all__ = [
     "ProductPackagingViewSet",
@@ -15,4 +18,8 @@ __all__ = [
     "StockMovementViewSet",
     "StockAdjustmentView",
     "InventoryValuationView",
+
+    "StockAlertListView",
+    "StockAlertMarkAllReadView",
+
 ]

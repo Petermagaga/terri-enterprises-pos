@@ -9,6 +9,7 @@ from .inventory_valuation import (
     InventoryValuationSerializer,
     InventoryValuationProductSerializer,
 )
+from .stock_alert import StockAlertSerializer
 
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "StockAdjustmentMovementSerializer",
     "InventoryValuationSerializer",
     "InventoryValuationProductSerializer",
+    "StockAlertSerializer"
 ]

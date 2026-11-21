@@ -6,7 +6,7 @@ import { LogOut, Settings } from 'lucide-react'
 import { useAuth } from '../../auth/useAuth'
 import AccountSettings from './AccountSettings'
 import Sidebar from './SideBar'
-
+import StockAlertBell from './StockAlertBell'
 export default function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -65,7 +65,7 @@ export default function AppLayout() {
           <span className="header-role">
             {user?.role === 'OWNER' ? 'Owner Account' : 'Cashier Account'}
           </span>
-
+          <StockAlertBell />
           <button
             type="button"
             className="account-settings-button"

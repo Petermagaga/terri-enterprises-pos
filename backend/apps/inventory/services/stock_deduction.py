@@ -9,7 +9,9 @@ from apps.inventory.models import (
     StockMovement,
 )
 from apps.products.models import Product
-
+from apps.inventory.services.stock_alerts import (
+    sync_product_stock_alert,
+)
 
 ZERO_QUANTITY = Decimal("0.000")
 
@@ -160,5 +162,9 @@ def deduct_stock_fifo(
 
     balance.quantity_on_hand -= quantity
     balance.save(update_fields=["quantity_on_hand", "updated_at"])
+    sync_product_stock_alert(
+        product=product,
+        quantity_on_hand=balance.quantity_on_hand,
+    )
 
     return deductions

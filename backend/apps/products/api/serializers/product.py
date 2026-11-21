@@ -4,7 +4,11 @@ from rest_framework import serializers
 
 from apps.products.models import Product
 from apps.products.services.product_creation import create_product
+from django.db import transaction
 
+from apps.inventory.services.stock_alerts import (
+    sync_product_stock_alert,
+)
 
 class ProductSerializer(serializers.ModelSerializer):
     """
@@ -48,6 +52,7 @@ class ProductSerializer(serializers.ModelSerializer):
             detail = getattr(exc, "message_dict", None) or exc.messages
             raise serializers.ValidationError(detail) from exc
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         try:
             for field, value in validated_data.items():
@@ -56,6 +61,9 @@ class ProductSerializer(serializers.ModelSerializer):
             instance.full_clean()
             instance.save()
 
+            sync_product_stock_alert(
+                product=instance,
+            )
             return instance
 
         except DjangoValidationError as exc:

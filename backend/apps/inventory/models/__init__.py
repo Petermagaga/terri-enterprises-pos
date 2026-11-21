@@ -4,6 +4,7 @@ from .purchase_item import PurchaseItem
 from .stock_batch import StockBatch
 from .stock_movement import StockMovement
 from .inventory_balance import InventoryBalance
+from .stock_alert import StockAlert
 
 __all__ = [
     "ProductPackaging",
@@ -12,4 +13,5 @@ __all__ = [
     "StockBatch",
     "StockMovement",
     "InventoryBalance",
+    "StockAlert",
 ]

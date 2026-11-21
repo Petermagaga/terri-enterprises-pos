@@ -9,7 +9,10 @@ import type {
   CreatePurchasePayload,
   CreatePurchaseItemPayload,
   InventoryValuation,
+  StockAlertsResponse,
+  MarkStockAlertsReadResponse,
 } from '../inventory.types'
+
 
 export async function getStockBalances(page = 1) {
   const response = await apiClient.get<PaginatedResponse<StockBalance>>(
@@ -108,6 +111,22 @@ export async function createProductPackaging(
 export async function getInventoryValuation() {
   const response = await apiClient.get<InventoryValuation>(
     '/inventory/valuation/',
+  )
+
+  return response.data
+}
+
+export async function getStockAlerts() {
+  const response = await apiClient.get<StockAlertsResponse>(
+    '/inventory/stock-alerts/',
+  )
+
+  return response.data
+}
+
+export async function markAllStockAlertsRead() {
+  const response = await apiClient.post<MarkStockAlertsReadResponse>(
+    '/inventory/stock-alerts/mark-all-read/',
   )
 
   return response.data

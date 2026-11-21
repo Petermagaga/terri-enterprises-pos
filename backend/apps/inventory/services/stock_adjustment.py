@@ -11,6 +11,9 @@ from apps.inventory.models import (
     StockBatch,
     StockMovement,
 )
+from apps.inventory.services.stock_alerts import (
+    sync_product_stock_alert,
+)
 from apps.inventory.services.stock_deduction import deduct_stock_fifo
 from apps.products.models import Product
 
@@ -207,6 +210,10 @@ def adjust_stock(
 
     balance.quantity_on_hand += quantity
     balance.save(update_fields=["quantity_on_hand", "updated_at"])
+    sync_product_stock_alert(
+    product=product,
+    quantity_on_hand=balance.quantity_on_hand,
+)
 
     return {
         "movement_type": movement_type,

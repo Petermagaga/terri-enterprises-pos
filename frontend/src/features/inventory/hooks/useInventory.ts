@@ -15,7 +15,9 @@ import {
   addPurchaseItem,
   getProductPackaging,
   deletePurchaseItem,
-  getInventoryValuation
+  getInventoryValuation,
+  getStockAlerts,
+  markAllStockAlertsRead,
 } from '../api/inventory.service'
 
 import type {
@@ -26,7 +28,7 @@ import { createProductPackaging } from '../api/inventory.service'
 
 
 import type { ProductPackaging } from '../inventory.types'
-
+import type { StockAlertsResponse } from '../inventory.types'
 export function useStockBalances(page = 1) {
   return useQuery({
     queryKey: ['stock-balances', page],
@@ -153,5 +155,39 @@ export function useDeletePurchaseItem() {
       })
     },
 
+  })
+}
+
+
+export function useStockAlerts() {
+  return useQuery({
+    queryKey: ['stock-alerts'],
+    queryFn: getStockAlerts,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+  })
+}
+
+export function useMarkAllStockAlertsRead() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: markAllStockAlertsRead,
+    onSuccess: () => {
+      queryClient.setQueryData<StockAlertsResponse>(
+        ['stock-alerts'],
+        (current) => {
+          if (!current) return current
+
+          return {
+            alerts: current.alerts.map((alert) => ({
+              ...alert,
+              is_read: true,
+            })),
+            unread_count: 0,
+          }
+        },
+      )
+    },
   })
 }

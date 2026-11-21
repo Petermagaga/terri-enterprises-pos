@@ -4,7 +4,9 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
-
+from apps.inventory.services.stock_alerts import (
+    sync_product_stock_alert,
+)
 from apps.inventory.models import (
     InventoryBalance,
     Purchase,
@@ -143,6 +145,10 @@ def receive_purchase(*, purchase, received_at=None):
         balance.save(update_fields=["quantity_on_hand", "updated_at"])
 
         received_batches.append(batch)
+        sync_product_stock_alert(
+            product=item.product,
+            quantity_on_hand=balance.quantity_on_hand,
+        )
 
     # Mark the purchase received only after all stock records are created.
     purchase.status = Purchase.Status.RECEIVED

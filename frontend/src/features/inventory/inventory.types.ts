@@ -88,3 +88,26 @@ export interface InventoryValuation {
   products_with_stock: number
   products: InventoryValuationProduct[]
 }
+
+export interface StockAlert {
+  id: number
+  product: number
+  product_name: string
+  product_sku: string
+  base_unit: string
+  quantity_on_hand: number | string
+  reorder_level: number
+  is_out_of_stock: boolean
+  is_read: boolean
+  created_at: string
+}
+
+export interface StockAlertsResponse {
+  alerts: StockAlert[]
+  unread_count: number
+}
+
+export interface MarkStockAlertsReadResponse {
+  marked_read: number
+  unread_count: number
+}
